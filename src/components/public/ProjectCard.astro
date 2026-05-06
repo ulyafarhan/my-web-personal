@@ -1,0 +1,95 @@
+---
+import type { Proyek } from "@/core/models/proyek";
+
+interface Props {
+  project: Proyek;
+  glowColor: string;
+}
+
+const { project, glowColor } = Astro.props;
+---
+
+<a 
+  href={`/proyek/${project.slug}`} 
+  class="project-card stagger-item group relative flex flex-col justify-between overflow-hidden rounded-md border border-solid border-[#333] bg-[#060010] p-6 transition-all duration-300 ease-in-out hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] h-full"
+  data-glow-color={glowColor}
+>
+  <!-- Border Glow Overlay -->
+  <div class="border-glow absolute inset-0 pointer-events-none z-10"></div>
+  
+  <!-- Particle Container -->
+  <div class="particle-container absolute inset-0 z-0 overflow-hidden pointer-events-none"></div>
+
+  <!-- Card Content -->
+  <div class="relative z-20 h-full flex flex-col">
+    <div class="flex items-center justify-between mb-6">
+       <div class="flex flex-wrap gap-2">
+         {project.tags?.slice(0, 2).map(tag => (
+           <span class="text-[9px] font-bold uppercase tracking-widest text-slate-500 bg-white/5 px-2 py-1 rounded-sm group-hover:text-purple-400 group-hover:bg-purple-400/10 transition-colors duration-500">{tag.nama}</span>
+         ))}
+       </div>
+       <div class="h-8 w-8 rounded-full border border-white/10 flex items-center justify-center text-white/50 group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500 transition-all duration-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+       </div>
+    </div>
+
+    <div class="mt-auto">
+      <h4 class="card__title text-xl font-normal text-white m-0 mb-1 line-clamp-1">{project.judul}</h4>
+      <p class="card__description text-xs leading-5 text-slate-400 line-clamp-2 opacity-90">
+        {project.ringkasan}
+      </p>
+    </div>
+  </div>
+</a>
+
+<style define:vars={{ glowColor }}>
+  .border-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    background: radial-gradient(
+      var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+      rgba(var(--glowColor), calc(var(--glow-intensity) * 0.8)) 0%,
+      rgba(var(--glowColor), calc(var(--glow-intensity) * 0.4)) 30%,
+      transparent 60%
+    );
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: subtract;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    opacity: 0;
+  }
+
+  .project-card:hover .border-glow::after {
+    opacity: 1;
+  }
+
+  .project-card:hover {
+    box-shadow: 0 4px 20px rgba(46, 24, 78, 0.4), 0 0 30px rgba(var(--glowColor), 0.2);
+  }
+
+  :global(.particle) {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(var(--glowColor), 1);
+    box-shadow: 0 0 6px rgba(var(--glowColor), 0.6);
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  :global(.particle::before) {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: rgba(var(--glowColor), 0.2);
+    border-radius: 50%;
+    z-index: -1;
+  }
+</style>

@@ -1,0 +1,104 @@
+---
+interface Props {
+  email: string;
+  ownerName: string;
+}
+
+const { email, ownerName } = Astro.props;
+---
+
+<section class="py-24 px-8 sm:px-12 lg:px-20 relative overflow-hidden">
+  <div class="mx-auto max-w-7xl">
+    <div class="cta-container relative overflow-hidden rounded-md border border-white/10 bg-[#060606]/80 p-12 lg:p-24 shadow-2xl group">
+      
+      <!-- High-Tech Background Patterns -->
+      <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-noise-pattern opacity-10"></div>
+        <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+
+        
+        <!-- Moving Spotlights -->
+        <div class="spotlight spotlight-1 absolute -left-20 -top-20 h-96 w-96 rounded-full bg-cyan-500/10 blur-[100px] transition-transform duration-1000 group-hover:scale-125"></div>
+        <div class="spotlight spotlight-2 absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-purple-500/10 blur-[100px] transition-transform duration-1000 group-hover:scale-125"></div>
+      </div>
+
+      <!-- Content -->
+      <div class="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto">
+        <div class="mb-8 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">
+           <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-cyan-500"></span>
+           </span>
+           Rekayasa Tingkat Lanjut
+        </div>
+
+        <h2 class="text-4xl font-black text-white sm:text-6xl tracking-tight leading-[1.1]">
+          Siap mengembangkan <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">arsitektur digital Anda?</span>
+        </h2>
+        
+        <p class="mt-8 text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Mari kita bangun sesuatu yang tahan lama, skalabel, dan memukau secara visual. Saat ini saya tersedia untuk konsultasi arsitektur dan peran pengembangan performa tinggi.
+        </p>
+        
+        <div class="mt-12 flex flex-wrap justify-center gap-6">
+          <a href={`mailto:${email}`} class="group/btn relative inline-flex items-center gap-3 rounded-full bg-white px-10 py-5 text-[11px] font-black uppercase tracking-widest text-black transition-all hover:bg-cyan-100 hover:shadow-[0_0_30px_rgba(34,211,238,0.4)]">
+            Mulai Diskusi
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover/btn:translate-x-1"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </a>
+          
+          <div class="flex items-center gap-4 rounded-md border border-white/5 bg-white/5 px-8 py-4 backdrop-blur-xl">
+             <div class="flex -space-x-3">
+                {[1,2,3].map(i => (
+                  <div class={`h-9 w-9 rounded-full border-2 border-[#060606] bg-slate-800 flex items-center justify-center text-[10px] font-bold text-white shadow-xl`}>
+                    {String.fromCharCode(64 + i)}
+                  </div>
+                ))}
+             </div>
+             <div class="text-left">
+                <p class="text-[11px] font-bold text-white">Bergabung dengan 50+ Mitra</p>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest">Kolaborasi Global</p>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decorative Floating Asset -->
+      <div class="absolute bottom-0 right-0 p-8 opacity-20 group-hover:opacity-40 transition-opacity duration-700 hidden lg:block">
+         <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" class="animate-pulse"><path d="m12 14 4-4 4 4-4 4-4-4Z"/><path d="M12 14L8 10l-4 4 4 4 4-4Z"/><path d="m12 14 4-4-4-4-4 4 4 4Z"/><path d="m12 14 4 4-4 4-4-4 4-4Z"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bg-noise-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .bg-grid-pattern {
+
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .cta-container {
+    transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1), border-color 0.5s ease;
+  }
+
+  .cta-container:hover {
+    border-color: rgba(34, 211, 238, 0.3);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .spotlight {
+    animation: float 10s ease-in-out infinite;
+  }
+
+  .spotlight-2 {
+    animation-delay: -5s;
+  }
+</style>

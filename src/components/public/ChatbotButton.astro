@@ -1,0 +1,197 @@
+---
+// src/components/public/ChatbotButton.astro
+---
+
+<div class="fixed bottom-6 right-6 z-[100] group">
+  <!-- Chatbot Trigger Button -->
+  <button
+    id="chatbot-trigger"
+    class="flex h-14 w-14 items-center justify-center rounded-full bg-cyan-500 text-black shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] active:scale-95"
+    aria-label="Tanya AI Asisten"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chat-icon"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="close-icon hidden"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+  </button>
+
+  <!-- Chat Window -->
+  <div
+    id="chatbot-window"
+    class="absolute bottom-20 right-0 hidden w-[350px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#080808]/95 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 opacity-0 translate-y-4"
+  >
+    <!-- Header -->
+    <div class="flex items-center gap-3 bg-white/5 p-4 border-b border-white/5">
+      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+      </div>
+      <div class="text-left">
+        <h4 class="text-sm font-bold text-white">AI Assistant</h4>
+        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Online & Ready</p>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="chat-messages" class="flex-1 space-y-4 overflow-y-auto p-4 text-left max-h-[400px] min-h-[300px] scrollbar-thin scrollbar-thumb-white/10">
+      <div class="flex gap-3">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-cyan-400">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+        </div>
+        <div class="rounded-2xl rounded-tl-none bg-white/5 p-3 text-xs leading-relaxed text-slate-300">
+          Halo! Saya asisten AI portfolio ini. Ada yang bisa saya bantu terkait proyek atau keahlian Farhan?
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <form id="chat-form" class="border-t border-white/5 p-4 bg-white/2">
+      <div class="relative">
+        <input
+          type="text"
+          id="chat-input"
+          placeholder="Tanyakan sesuatu..."
+          class="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 pr-12 text-xs text-white outline-none transition-all focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30"
+          required
+        />
+        <button
+          type="submit"
+          class="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500 text-black transition-transform hover:scale-105 active:scale-95"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  interface ChatMessage {
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+  }
+
+  let chatHistory: ChatMessage[] = [];
+  const trigger = document.getElementById('chatbot-trigger');
+  const window_chat = document.getElementById('chatbot-window');
+  const chatForm = document.getElementById('chat-form');
+  const chatInput = document.getElementById('chat-input') as HTMLInputElement;
+  const messagesContainer = document.getElementById('chat-messages');
+
+  const chatIcon = trigger?.querySelector('.chat-icon');
+  const closeIcon = trigger?.querySelector('.close-icon');
+
+  // Toggle Chat Window
+  trigger?.addEventListener('click', () => {
+    const isHidden = window_chat?.classList.contains('hidden');
+    
+    if (isHidden) {
+      window_chat?.classList.remove('hidden');
+      setTimeout(() => {
+        window_chat?.classList.remove('opacity-0', 'translate-y-4');
+      }, 10);
+      chatIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('hidden');
+    } else {
+      window_chat?.classList.add('opacity-0', 'translate-y-4');
+      setTimeout(() => {
+        window_chat?.classList.add('hidden');
+      }, 300);
+      chatIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+    }
+  });
+
+  // Handle Form Submission
+  chatForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    // 1. Add User Message to UI
+    appendMessage('user', message);
+    chatInput.value = '';
+
+    // 2. Prepare Loading State
+    const loadingId = 'loading-' + Date.now();
+    appendMessage('bot', 'Berpikir...', loadingId);
+
+    try {
+      // 3. Call Chatbot API
+      const response = await fetch('/api/chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pesan: message, riwayat: chatHistory })
+      });
+
+      const data = (await response.json()) as any;
+      
+      // 4. Update UI with Bot Response
+      const loadingEl = document.getElementById(loadingId);
+      if (loadingEl) {
+        const textEl = loadingEl.querySelector('.message-text');
+        if (textEl) {
+          // Akses data.data.jawaban (sesuai struktur helper Success)
+          const reply = data.data?.jawaban || 'Maaf, saya tidak mendapatkan respons yang jelas.';
+          textEl.textContent = reply;
+        }
+        loadingEl.id = ''; // Bersihkan ID loading
+      }
+
+      // 5. Update History
+      chatHistory.push({ role: 'user', content: message });
+      const botReply = data.data?.jawaban || '';
+      if (botReply) chatHistory.push({ role: 'assistant', content: botReply });
+
+      // Keep history manageable
+      if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
+
+    } catch (error) {
+      const loadingEl = document.getElementById(loadingId);
+      if (loadingEl) {
+        const textEl = loadingEl.querySelector('.message-text');
+        if (textEl) textEl.textContent = 'Maaf, terjadi kesalahan koneksi. Silakan coba lagi.';
+      }
+    }
+
+    scrollToBottom();
+  });
+
+  function appendMessage(role, text, id = '') {
+    if (!messagesContainer) return;
+
+    const div = document.createElement('div');
+    div.className = 'flex gap-3 ' + (role === 'user' ? 'flex-row-reverse' : '');
+    if (id) div.id = id;
+
+    const iconHtml = role === 'bot' 
+      ? `<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-cyan-400">
+           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+         </div>`
+      : `<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400">
+           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+         </div>`;
+
+    const bubbleClass = role === 'bot'
+      ? 'rounded-2xl rounded-tl-none bg-white/5 text-slate-300'
+      : 'rounded-2xl rounded-tr-none bg-cyan-500 text-black font-medium';
+
+    div.innerHTML = `
+      ${iconHtml}
+      <div class="${bubbleClass} p-3 text-xs leading-relaxed max-w-[80%] message-text">
+        ${text}
+      </div>
+    `;
+
+    messagesContainer.appendChild(div);
+    scrollToBottom();
+  }
+
+  function scrollToBottom() {
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  }
+
+  // Handle auto-initialization for Astro View Transitions
+  document.addEventListener('astro:page-load', () => {
+     chatHistory = [];
+  });
+</script>

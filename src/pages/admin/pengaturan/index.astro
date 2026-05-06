@@ -1,0 +1,111 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { getSettings } from "@/lib/content";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import SettingsFormFields from "@/components/admin/settings/SettingsFormFields.astro";
+import InfrastructureStatus from "@/components/admin/settings/InfrastructureStatus.astro";
+
+export const prerender = false;
+
+const config = (await getSettings(Astro.locals.runtime.env.DB)) as Record<string, string>;
+
+const fields = [
+  { key: "nama_pemilik", label: "Nama Pemilik", group: "profil", type: "input" },
+  { key: "profesi", label: "Profesi", group: "profil", type: "input" },
+  { key: "hero_badge", label: "Badge Hero", group: "publik", type: "input" },
+  { key: "hero_title", label: "Judul Hero", group: "publik", type: "textarea" },
+  { key: "hero_desc", label: "Deskripsi Hero", group: "publik", type: "textarea" },
+  { key: "ringkasan_diri", label: "Ringkasan Diri untuk AI dan SEO", group: "profil", type: "textarea" },
+  { key: "cta_primary", label: "CTA Utama", group: "publik", type: "input" },
+  { key: "cta_secondary", label: "CTA Kedua", group: "publik", type: "input" },
+  { key: "email_kontak", label: "Email Kontak", group: "kontak", type: "input" },
+  { key: "github_url", label: "URL GitHub", group: "kontak", type: "input" },
+  { key: "linkedin_url", label: "URL LinkedIn", group: "kontak", type: "input" },
+  { key: "instagram_url", label: "URL Instagram", group: "kontak", type: "input" },
+  { key: "whatsapp_url", label: "URL WhatsApp", group: "kontak", type: "input" },
+  { key: "tiktok_url", label: "URL TikTok", group: "kontak", type: "input" },
+  { key: "stat_1_value", label: "Statistik 1: Nilai", group: "publik", type: "input" },
+  { key: "stat_1_label", label: "Statistik 1: Label", group: "publik", type: "input" },
+  { key: "stat_2_value", label: "Statistik 2: Nilai", group: "publik", type: "input" },
+  { key: "stat_2_label", label: "Statistik 2: Label", group: "publik", type: "input" },
+  { key: "stat_3_value", label: "Statistik 3: Nilai", group: "publik", type: "input" },
+  { key: "stat_3_label", label: "Statistik 3: Label", group: "publik", type: "input" },
+];
+---
+
+<LayoutAdmin
+  title="Konfigurasi Platform"
+  subtitle="Kelola identitas digital, narasi visual, dan metrik publik yang membentuk portofolio Anda."
+  breadcrumbs={[{ label: "Pengaturan" }]}
+>
+  <form id="formSettings" class="grid gap-8 xl:grid-cols-[1fr_380px]">
+    <Card class="border-white/5 bg-white/[0.01]">
+      <CardHeader class="border-b border-white/5 pb-6">
+        <CardTitle class="text-xl font-bold text-white">Parameter Global</CardTitle>
+        <CardDescription>Seluruh perubahan akan langsung berdampak pada tampilan frontend secara real-time.</CardDescription>
+      </CardHeader>
+      <CardContent class="p-6">
+        <SettingsFormFields fields={fields} config={config} />
+      </CardContent>
+    </Card>
+
+    <div class="space-y-6">
+      <InfrastructureStatus />
+      <Card class="border-white/5 bg-white/[0.02] shadow-2xl">
+        <CardContent class="p-4">
+          <Button id="btnSave" type="submit" class="w-full rounded-full bg-cyan-500 font-black uppercase tracking-widest text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:bg-cyan-400">
+            Simpan Perubahan
+          </Button>
+          <div id="settingsMessage" class="mt-4 hidden p-3 rounded-l border text-[11px] font-bold"></div>
+        </CardContent>
+      </Card>
+    </div>
+  </form>
+
+  <script>
+    const form = document.getElementById("formSettings") as HTMLFormElement | null;
+    const button = document.getElementById("btnSave") as HTMLButtonElement | null;
+    const message = document.getElementById("settingsMessage") as HTMLDivElement | null;
+
+    function showMessage(text: string, ok = true) {
+      if (!message) return;
+      message.textContent = text;
+      message.className = `mt-4 rounded-l border p-4 text-[11px] font-bold leading-relaxed ${ok ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400" : "border-red-500/20 bg-red-500/5 text-red-400"}`;
+      message.classList.remove("hidden");
+    }
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!button) return;
+      button.disabled = true;
+      button.textContent = "Menyinkronkan...";
+
+      const entries = Array.from(form.querySelectorAll("[name]")).map((el) => {
+        const input = el as HTMLInputElement | HTMLTextAreaElement;
+        return { kunci: input.name, nilai: input.value, grup: input.dataset.group || "publik" };
+      });
+
+      try {
+        const res = await fetch("/api/admin/pengaturan", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entries),
+        });
+        if (!res.ok) throw new Error("Gagal melakukan sinkronisasi database.");
+        showMessage("Konfigurasi platform berhasil diperbarui.");
+      } catch (err) {
+        showMessage(err instanceof Error ? err.message : "Kesalahan sistem saat menyimpan data.", false);
+      } finally {
+        button.disabled = false;
+        button.textContent = "Simpan Perubahan";
+      }
+    });
+  </script>
+</LayoutAdmin>

@@ -1,0 +1,32 @@
+---
+---
+
+<div class="hidden items-center gap-1 md:flex">
+  <!-- Section links (smooth scroll on beranda) -->
+  <a href="/#keahlian" class="nav-link relative px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40 transition-colors duration-300 hover:text-cyan-400" data-section="keahlian">Keahlian</a>
+  <a href="/#karya" class="nav-link relative px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40 transition-colors duration-300 hover:text-cyan-400" data-section="karya">Karya</a>
+  <a href="/#pengalaman" class="nav-link relative px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40 transition-colors duration-300 hover:text-cyan-400" data-section="pengalaman">Pengalaman</a>
+  <a href="/#sertifikasi" class="nav-link relative px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40 transition-colors duration-300 hover:text-cyan-400" data-section="sertifikasi">Sertifikat</a>
+
+  <!-- Dropdown: Halaman Lain -->
+  <div class="relative" id="nav-dropdown-wrapper">
+    <button id="nav-dropdown-btn" class="flex items-center gap-1 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40 transition-colors duration-300 hover:text-cyan-400">
+      Lainnya
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300" id="dropdown-chevron"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div id="nav-dropdown-menu" class="absolute right-0 top-full mt-3 hidden min-w-[180px] rounded-xl border border-white/[0.06] bg-black/90 p-2 shadow-[0_16px_48px_rgba(0,0,0,0.6)] backdrop-blur-3xl">
+      <a href="/pengalaman" class="dropdown-link flex items-center gap-3 rounded-lg px-4 py-2.5 text-[12px] font-medium text-white/60 transition-colors duration-200 hover:text-cyan-400">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+        Pengalaman
+      </a>
+      <a href="/proyek" class="dropdown-link flex items-center gap-3 rounded-lg px-4 py-2.5 text-[12px] font-medium text-white/60 transition-colors duration-200 hover:text-cyan-400">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Portofolio
+      </a>
+      <a href="/sertifikat" class="dropdown-link flex items-center gap-3 rounded-lg px-4 py-2.5 text-[12px] font-medium text-white/60 transition-colors duration-200 hover:text-cyan-400">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Sertifikat
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+---
+import type { Keahlian } from "@/lib/content";
+import { getSkillLevel } from "@/lib/public/skill-animations";
+
+interface Props {
+  skills: Keahlian[];
+  avgPercent: number;
+  categories: string[];
+  topSkill: Keahlian | null;
+}
+
+const { skills, avgPercent, categories, topSkill } = Astro.props;
+---
+
+<div class="flex flex-col gap-4 h-full">
+  <!-- Overall Stats Card -->
+  <div
+    class="skill-card group relative overflow-hidden rounded-md border border-white/[0.06] bg-[#080808]/60 p-8 backdrop-blur-sm transition-all duration-700 hover:border-violet-500/20"
+  >
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-violet-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+    >
+    </div>
+
+    <div class="relative z-10">
+      <h4 class="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-8">
+        Statistik Keseluruhan
+      </h4>
+
+      <!-- Radial Progress -->
+      <div class="flex justify-center mb-10">
+        <div class="radial-wrap relative h-44 w-44">
+          <svg viewBox="0 0 120 120" class="h-full w-full -rotate-90">
+            <circle
+              cx="60"
+              cy="60"
+              r="50"
+              fill="none"
+              stroke="rgba(255,255,255,0.04)"
+              stroke-width="8"></circle>
+            <circle
+              cx="60"
+              cy="60"
+              r="50"
+              fill="none"
+              stroke="url(#radialGradient)"
+              stroke-width="8"
+              stroke-linecap="round"
+              stroke-dasharray={`${2 * Math.PI * 50}`}
+              stroke-dashoffset={`${2 * Math.PI * 50 * (1 - avgPercent / 100)}`}
+              class="radial-ring"
+              style={`--target-offset: ${2 * Math.PI * 50 * (1 - avgPercent / 100)}`}
+            ></circle>
+            <defs>
+              <linearGradient id="radialGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#8b5cf6"></stop>
+                <stop offset="100%" stop-color="#22d3ee"></stop>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span
+              class="radial-number text-4xl font-black text-white tabular-nums"
+              data-target={avgPercent}>0</span
+            >
+            <span class="text-[9px] font-bold uppercase tracking-[0.3em] text-white/30 mt-1"
+              >Rata-Rata</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-md border border-white/[0.04] bg-white/[0.02] p-4 text-center">
+          <span class="text-2xl font-black text-white">{skills.length}</span>
+          <p class="text-[9px] font-bold uppercase tracking-[0.3em] text-white/20 mt-1">
+            Total Skill
+          </p>
+        </div>
+        <div class="rounded-md border border-white/[0.04] bg-white/[0.02] p-4 text-center">
+          <span class="text-2xl font-black text-violet-400">{categories.length}</span>
+          <p class="text-[9px] font-bold uppercase tracking-[0.3em] text-white/20 mt-1">
+            Kategori
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Skill Card -->
+  {
+    topSkill && (
+      <div class="skill-card group flex-1 flex flex-col items-center justify-center relative overflow-hidden rounded-md border border-white/[0.06] bg-[#080808]/60 p-8 backdrop-blur-sm transition-all duration-700 hover:border-violet-500/20 text-center">
+        <div class="absolute inset-0 bg-gradient-to-t from-violet-500/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+        <p class="text-[9px] font-black uppercase tracking-[0.4em] text-violet-400/60 mb-6">
+          #1 Top Skill
+        </p>
+
+        <div class="flex flex-col items-center justify-center gap-4">
+          <span class="flex h-16 w-16 items-center justify-center rounded-full border border-violet-500/30 bg-violet-500/10 text-3xl font-black text-violet-300 shadow-[0_0_30px_rgba(139,92,246,0.2)]">
+            {getSkillLevel(topSkill.persentase).rank}
+          </span>
+
+          <div>
+            <h5 class="text-xl font-bold text-white mb-1">{topSkill.nama}</h5>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
+              {topSkill.kategori || "Umum"} &bull; {topSkill.persentase}%
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+</div>

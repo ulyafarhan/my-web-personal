@@ -1,0 +1,207 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { D1ProyekRepository } from "@/core/repositories/D1ProyekRepository";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export const prerender = false;
+
+const repo = new D1ProyekRepository(Astro.locals.runtime.env.DB);
+const tags = await repo.getAllTags();
+---
+
+<LayoutAdmin
+  title="Taksonomi Teknologi"
+  subtitle="Kelola label teknologi, framework, dan stack yang digunakan untuk mengklasifikasikan proyek Anda."
+  breadcrumbs={[{ label: 'Tag' }]}
+>
+  <div class="grid gap-8 lg:grid-cols-[1fr_360px]">
+    <!-- List Section -->
+    <div class="space-y-6">
+      <Card class="border-white/5 bg-white/[0.01]">
+        <CardHeader class="border-b border-white/5 pb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <CardTitle class="text-xl font-bold text-white">Daftar Tag</CardTitle>
+              <CardDescription>Label yang tersedia untuk proyek portofolio.</CardDescription>
+            </div>
+            <span class="rounded-full bg-cyan-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-cyan-400 ring-1 ring-cyan-500/20">
+              {tags.length} Label
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent class="p-0">
+          <div class="p-6">
+             {tags.length === 0 ? (
+                <div class="p-12 text-center text-sm text-slate-500 italic">Belum ada tag terdaftar.</div>
+              ) : (
+                <div class="flex flex-wrap gap-3">
+                  {tags.map((tag) => (
+                    <div class="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 pl-4 pr-1 py-1 hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all">
+                      <span class="text-xs font-bold text-slate-300 group-hover:text-cyan-400">{tag.nama}</span>
+                      <div class="flex items-center">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          data-edit={JSON.stringify(tag)}
+                          class="h-7 w-7 rounded-full text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/10"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          data-delete-tag={tag.id}
+                          class="h-7 w-7 rounded-full text-slate-500 hover:text-red-400 hover:bg-red-500/10"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    <!-- Form Section -->
+    <aside class="space-y-6">
+      <Card class="border-white/5 bg-white/[0.02] sticky top-24 shadow-2xl">
+        <CardHeader class="border-b border-white/5">
+          <CardTitle id="formTitle" class="text-sm font-black uppercase tracking-widest text-cyan-500">Input Tag Baru</CardTitle>
+        </CardHeader>
+        <CardContent class="pt-6">
+          <form id="formTag" class="space-y-5">
+            <input type="hidden" id="tagId" />
+            
+            <div class="grid gap-2">
+              <Label for="tagNama" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Nama Teknologi</Label>
+              <Input id="tagNama" name="nama" required placeholder="Astro / Vue.js" class="rounded-md border-white/10 bg-white/5 focus:ring-cyan-500/50" />
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="tagSlug" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Slug Identifikasi</Label>
+              <Input id="tagSlug" name="slug" required placeholder="astro-js" class="rounded-md border-white/10 bg-white/5 focus:ring-cyan-500/50" />
+            </div>
+
+            <div class="pt-4 space-y-3">
+              <Button type="submit" id="btnSubmit" class="w-full rounded-full bg-cyan-500 font-black uppercase tracking-widest text-slate-950 shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:bg-cyan-400">
+                Simpan Tag
+              </Button>
+              <Button type="button" id="btnReset" variant="outline" class="w-full rounded-full border-white/10 bg-white/5 font-bold hover:bg-white/10">
+                Reset Form
+              </Button>
+            </div>
+            
+            <p id="formMessage" class="hidden p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest"></p>
+          </form>
+        </CardContent>
+      </Card>
+    </aside>
+  </div>
+
+  <script>
+    const form = document.getElementById("formTag") as HTMLFormElement;
+    const tagId = document.getElementById("tagId") as HTMLInputElement;
+    const nameInput = document.getElementById("tagNama") as HTMLInputElement;
+    const slugInput = document.getElementById("tagSlug") as HTMLInputElement;
+    const formTitle = document.getElementById("formTitle");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const formMessage = document.getElementById("formMessage");
+
+    function slugify(value: string) {
+      return String(value || "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+    }
+
+    function showMessage(text: string, isError = false) {
+      if (!formMessage) return;
+      formMessage.textContent = text;
+      formMessage.className = `p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest ${isError ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`;
+      formMessage.classList.remove('hidden');
+      setTimeout(() => formMessage.classList.add('hidden'), 3000);
+    }
+
+    nameInput?.addEventListener("input", () => {
+      if (slugInput && !slugInput.dataset.touched) {
+        slugInput.value = slugify(nameInput.value);
+      }
+    });
+
+    slugInput?.addEventListener("input", () => {
+      slugInput.dataset.touched = "true";
+      slugInput.value = slugify(slugInput.value);
+    });
+
+    document.querySelectorAll("[data-edit]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const tag = JSON.parse(button.getAttribute("data-edit") || "{}");
+        tagId.value = tag.id || "";
+        nameInput.value = tag.nama || "";
+        slugInput.value = tag.slug || "";
+        slugInput.dataset.touched = "true";
+        
+        if (formTitle) formTitle.textContent = "Edit Taksonomi";
+        if (btnSubmit) btnSubmit.textContent = "Perbarui Tag";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    document.getElementById("btnReset")?.addEventListener("click", () => {
+      form.reset();
+      tagId.value = "";
+      delete slugInput.dataset.touched;
+      if (formTitle) formTitle.textContent = "Input Tag Baru";
+      if (btnSubmit) btnSubmit.textContent = "Simpan Tag";
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const id = tagId.value;
+      const payload = { nama: nameInput.value, slug: slugInput.value };
+      
+      try {
+        if (btnSubmit) btnSubmit.setAttribute('disabled', 'true');
+        const res = await fetch(id ? `/api/admin/tag/${id}` : "/api/admin/tag", {
+          method: id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          showMessage("Tag berhasil disinkronkan.");
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          const errorData = await res.json() as any;
+          throw new Error(errorData.message || "Gagal menyimpan tag.");
+        }
+      } catch (err) {
+        showMessage(err instanceof Error ? err.message : "Kesalahan jaringan.", true);
+      } finally {
+        if (btnSubmit) btnSubmit.removeAttribute('disabled');
+      }
+    });
+
+    document.querySelectorAll("[data-delete-tag]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.getAttribute("data-delete-tag");
+        if (!id || !confirm("Hapus tag ini secara permanen? Relasi pada proyek akan dilepas.")) return;
+        
+        try {
+          const res = await fetch(`/api/admin/tag/${id}`, { method: "DELETE" });
+          if (res.ok) window.location.reload();
+          else alert("Gagal menghapus tag.");
+        } catch (err) {
+          alert("Terjadi kesalahan jaringan.");
+        }
+      });
+    });
+  </script>
+</LayoutAdmin>

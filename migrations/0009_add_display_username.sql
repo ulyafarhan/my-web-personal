@@ -1,0 +1,1 @@
+-- No-op: displayUsername is created in 0008_add_username_to_user.sql.

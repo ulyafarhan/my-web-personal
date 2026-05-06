@@ -1,0 +1,39 @@
+---
+import type { Keahlian } from "@/lib/content";
+
+interface Props {
+  skills: Keahlian[];
+  categories: string[];
+}
+
+const { skills, categories } = Astro.props;
+---
+
+<div class="skill-card relative overflow-hidden rounded-md border border-white/[0.06] bg-white/[0.02] p-8 backdrop-blur-sm transition-all duration-700 hover:border-violet-500/20">
+  <div class="flex items-center justify-between mb-8">
+    <h4 class="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Per Kategori</h4>
+    <div class="flex items-center gap-1">
+      <span class="flex h-6 w-6 items-center justify-center rounded-full bg-white/5 text-white/30 text-xs">&larr;</span>
+      <span class="flex h-6 w-6 items-center justify-center rounded-full bg-white/5 text-white/30 text-xs">&rarr;</span>
+    </div>
+  </div>
+  
+  <div id="kategori-carousel" class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 hide-scrollbar">
+    {categories.map(cat => {
+      const catSkills = skills.filter(s => (s.kategori || 'Umum') === cat);
+      const catAvg = Math.round(catSkills.reduce((s, k) => s + k.persentase, 0) / catSkills.length);
+      return (
+        <div class="group/cat shrink-0 w-[240px] sm:w-[280px] snap-center rounded-md border border-white/[0.04] bg-white/[0.02] p-5 transition-all duration-500 hover:border-violet-500/15 hover:bg-violet-500/[0.03]">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-white/60 group-hover/cat:text-white transition-colors">{cat}</span>
+            <span class="text-[10px] font-mono font-black text-violet-400">{catAvg}%</span>
+          </div>
+          <div class="h-1.5 w-full rounded-full bg-white/[0.03] overflow-hidden">
+            <div class="cat-bar h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style={`width: 0%;`} data-width={catAvg}></div>
+          </div>
+          <p class="mt-2 text-[9px] font-bold text-white/15 uppercase tracking-widest">{catSkills.length} skill{catSkills.length !== 1 ? 's' : ''}</p>
+        </div>
+      );
+    })}
+  </div>
+</div>

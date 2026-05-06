@@ -1,0 +1,131 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { getKeahlian } from "@/lib/content";
+import SkillList from "@/components/admin/keahlian/SkillList.astro";
+import SkillForm from "@/components/admin/keahlian/SkillForm.astro";
+
+export const prerender = false;
+
+const keahlian = await getKeahlian(Astro.locals.runtime.env.DB, 100);
+---
+
+<LayoutAdmin
+  title="Statistik Keahlian"
+  subtitle="Kelola daftar keahlian teknis dan level penguasaan Anda. Maksimal 8 keahlian ditampilkan di chart beranda."
+  breadcrumbs={[{ label: 'Keahlian' }]}
+>
+  <div class="grid gap-8 lg:grid-cols-[1fr_420px]">
+    <SkillList keahlian={keahlian} />
+    <aside class="space-y-6">
+      <SkillForm />
+    </aside>
+  </div>
+
+  <script>
+    const form = document.getElementById("formKeahlian") as HTMLFormElement;
+    const skillId = document.getElementById("skillId") as HTMLInputElement;
+    const formTitle = document.getElementById("formTitle");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const formMessage = document.getElementById("formMessage");
+    const slider = document.getElementById("persentaseSlider") as HTMLInputElement;
+    const numInput = document.getElementById("persentase") as HTMLInputElement;
+    const previewBar = document.getElementById("previewBar");
+    const warnaInput = document.getElementById("warna") as HTMLInputElement;
+    const warnaText = document.getElementById("warnaText") as HTMLInputElement;
+
+    function syncPersentase(val: string) {
+      const v = Math.max(0, Math.min(100, Number(val) || 0));
+      if (slider) slider.value = String(v);
+      if (numInput) numInput.value = String(v);
+      if (previewBar) (previewBar as HTMLElement).style.width = `${v}%`;
+    }
+    
+    slider?.addEventListener('input', () => syncPersentase(slider.value));
+    numInput?.addEventListener('input', () => syncPersentase(numInput.value));
+    warnaInput?.addEventListener('input', () => { if (warnaText) warnaText.value = warnaInput.value; });
+    warnaText?.addEventListener('input', () => { if (warnaInput) warnaInput.value = warnaText.value; });
+
+    function showMessage(text: string, isError = false) {
+      if (!formMessage) return;
+      formMessage.textContent = text;
+      formMessage.className = `p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest ${isError ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`;
+      formMessage.classList.remove('hidden');
+      setTimeout(() => formMessage.classList.add('hidden'), 3000);
+    }
+
+    document.querySelectorAll("[data-edit-skill]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const item = JSON.parse(button.getAttribute("data-edit-skill") || "{}");
+        if (skillId) skillId.value = item.id || "";
+        const namaInput = document.getElementById("nama") as HTMLInputElement;
+        if (namaInput) namaInput.value = item.nama || "";
+        syncPersentase(String(item.persentase || 0));
+        const katSelect = document.getElementById("kategori") as HTMLInputElement;
+        if (katSelect) katSelect.value = item.kategori || "";
+        const urutanInput = document.getElementById("urutan") as HTMLInputElement;
+        if (urutanInput) urutanInput.value = String(item.urutan || 0);
+        if (warnaInput) warnaInput.value = item.warna || "#22d3ee";
+        if (warnaText) warnaText.value = item.warna || "#22d3ee";
+        
+        if (formTitle) formTitle.textContent = "Edit Keahlian";
+        if (btnSubmit) btnSubmit.textContent = "Perbarui Keahlian";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    document.getElementById("btnReset")?.addEventListener("click", () => {
+      form?.reset();
+      if (skillId) skillId.value = "";
+      syncPersentase("50");
+      if (warnaInput) warnaInput.value = "#22d3ee";
+      if (warnaText) warnaText.value = "";
+      if (formTitle) formTitle.textContent = "Form Keahlian";
+      if (btnSubmit) btnSubmit.textContent = "Simpan Keahlian";
+    });
+
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const id = skillId?.value;
+      const payload = {
+        nama: (document.getElementById("nama") as HTMLInputElement).value,
+        persentase: Number(numInput?.value || 0),
+        kategori: (document.getElementById("kategori") as HTMLInputElement).value,
+        warna: warnaText?.value || warnaInput?.value || null,
+        urutan: Number((document.getElementById("urutan") as HTMLInputElement).value || 0),
+      };
+
+      try {
+        if (btnSubmit) btnSubmit.setAttribute('disabled', 'true');
+        const res = await fetch(id ? `/api/admin/keahlian/${id}` : "/api/admin/keahlian", {
+          method: id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          showMessage("Keahlian berhasil disinkronkan.");
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          throw new Error("Gagal menyimpan data.");
+        }
+      } catch (err) {
+        showMessage(err instanceof Error ? err.message : "Kesalahan jaringan.", true);
+      } finally {
+        if (btnSubmit) btnSubmit.removeAttribute('disabled');
+      }
+    });
+
+    document.querySelectorAll("[data-delete-skill]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.getAttribute("data-delete-skill");
+        if (!id || !confirm("Hapus keahlian ini secara permanen?")) return;
+        try {
+          const res = await fetch(`/api/admin/keahlian/${id}`, { method: "DELETE" });
+          if (res.ok) window.location.reload();
+          else alert("Gagal menghapus data.");
+        } catch (err) {
+          alert("Terjadi kesalahan jaringan.");
+        }
+      });
+    });
+  </script>
+</LayoutAdmin>

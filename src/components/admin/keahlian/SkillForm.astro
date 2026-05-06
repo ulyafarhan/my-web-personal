@@ -1,0 +1,72 @@
+---
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+---
+
+<Card class="border-white/5 bg-white/[0.02] sticky top-24 shadow-2xl">
+  <CardHeader class="border-b border-white/5">
+    <CardTitle id="formTitle" class="text-sm font-black uppercase tracking-widest text-violet-500">Form Keahlian</CardTitle>
+    <CardDescription class="text-[11px]">Masukkan nama skill dan level penguasaan (0-100%).</CardDescription>
+  </CardHeader>
+  <CardContent class="pt-6">
+    <form id="formKeahlian" class="space-y-5">
+      <input type="hidden" id="skillId" />
+      
+      <div class="grid gap-2">
+        <Label for="nama" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Nama Keahlian</Label>
+        <Input id="nama" name="nama" required placeholder="Laravel, TypeScript, Docker..." class="rounded-md border-white/10 bg-white/5 focus:ring-violet-500/50" />
+      </div>
+
+      <div class="grid gap-2">
+        <Label for="persentase" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Level Penguasaan</Label>
+        <div class="flex items-center gap-4">
+          <input type="range" id="persentaseSlider" min="0" max="100" value="50" class="flex-1 accent-violet-500 h-2 bg-white/5 rounded-full" />
+          <Input id="persentase" name="persentase" type="number" min="0" max="100" required value="50" class="w-20 rounded-md border-white/10 bg-white/5 text-center focus:ring-violet-500/50" />
+        </div>
+        <!-- Preview bar -->
+        <div class="h-2 w-full rounded-full bg-white/5 overflow-hidden mt-1">
+          <div id="previewBar" class="h-full rounded-full bg-violet-500 transition-all duration-200" style="width: 50%"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="grid gap-2">
+          <Label for="kategori" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Kategori</Label>
+          <select id="kategori" name="kategori" class="h-10 rounded-md border border-white/10 bg-white/5 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+            <option value="Backend" class="bg-slate-900">Backend</option>
+            <option value="Frontend" class="bg-slate-900">Frontend</option>
+            <option value="Data Science" class="bg-slate-900">Data Science</option>
+            <option value="Mobile" class="bg-slate-900">Mobile</option>
+            <option value="DevOps" class="bg-slate-900">DevOps</option>
+            <option value="Lainnya" class="bg-slate-900">Lainnya</option>
+          </select>
+        </div>
+        <div class="grid gap-2">
+          <Label for="urutan" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Prioritas</Label>
+          <Input id="urutan" name="urutan" type="number" value="0" class="rounded-md border-white/10 bg-white/5 focus:ring-violet-500/50" />
+        </div>
+      </div>
+
+      <div class="grid gap-2">
+        <Label for="warna" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Warna Bar (Opsional)</Label>
+        <div class="flex items-center gap-3">
+          <input type="color" id="warna" name="warna" value="#22d3ee" class="h-9 w-12 rounded-md border border-white/10 bg-transparent cursor-pointer" />
+          <Input id="warnaText" placeholder="#22d3ee" class="flex-1 rounded-md border-white/10 bg-white/5 focus:ring-violet-500/50" />
+        </div>
+      </div>
+
+      <div class="pt-4 space-y-3">
+        <Button type="submit" id="btnSubmit" class="w-full rounded-full bg-violet-500 font-black uppercase tracking-widest text-white shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:bg-violet-400">
+          Simpan Keahlian
+        </Button>
+        <Button type="button" id="btnReset" variant="outline" class="w-full rounded-full border-white/10 bg-white/5 font-bold hover:bg-white/10">
+          Reset Form
+        </Button>
+      </div>
+      
+      <p id="formMessage" class="hidden p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest"></p>
+    </form>
+  </CardContent>
+</Card>

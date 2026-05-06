@@ -1,0 +1,2 @@
+ALTER TABLE proyek ADD COLUMN url_demo TEXT;
+ALTER TABLE proyek ADD COLUMN url_repo TEXT;

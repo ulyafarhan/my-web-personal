@@ -1,0 +1,164 @@
+---
+import LayoutPublic from "@/layouts/LayoutPublic.astro";
+import Hero from "@/components/public/Hero.astro";
+import Partners from "@/components/public/Partners.astro";
+import ProjectShowcase from "@/components/public/ProjectShowcase.astro";
+import Expertise from "@/components/public/Expertise.astro";
+import Stats from "@/components/public/Stats.astro";
+import ExperienceFlow from "@/components/public/ExperienceFlow.astro";
+import BentoCTA from "@/components/public/BentoCTA.astro";
+import FAQ from "@/components/public/FAQ.astro";
+import ExperienceList from "@/components/public/ExperienceList.astro";
+import CertificateList from "@/components/public/CertificateList.astro";
+import SkillChart from "@/components/public/SkillChart.astro";
+import OtherSkills from "@/components/public/OtherSkills.astro";
+
+import {
+  getKeahlian,
+  getPengalamanIT,
+  getPublishedProjects,
+  getSertifikat,
+  getSettings,
+} from "@/lib/content";
+
+export const prerender = false;
+
+const db = Astro.locals.runtime?.env?.DB;
+
+let settings: any = {};
+let projects: any[] = [];
+let pengalaman: any[] = [];
+let sertifikat: any[] = [];
+let keahlian: any[] = [];
+
+if (db) {
+  [settings, projects, pengalaman, sertifikat, keahlian] = await Promise.all([
+    getSettings(db),
+    getPublishedProjects(db, 8),
+    getPengalamanIT(db, 3),
+    getSertifikat(db, 3),
+    getKeahlian(db, 8),
+  ]);
+} else {
+  // Fallback data default jika DB tidak ditemukan saat build
+  settings = await getSettings(null as any); 
+}
+
+const ownerName = settings.nama_pemilik;
+const stats = [
+  { value: settings.stat_1_value, label: settings.stat_1_label },
+  { value: settings.stat_2_value, label: settings.stat_2_label },
+  { value: settings.stat_3_value, label: settings.stat_3_label },
+];
+---
+
+<LayoutPublic
+  title={`${ownerName} | Portofolio Full-Stack Developer`}
+  description={settings.hero_desc}
+  ownerName={ownerName}
+  email={settings.email_kontak}
+  socials={{
+    github: settings.github_url,
+    instagram: settings.instagram_url,
+    linkedin: settings.linkedin_url,
+    whatsapp: settings.whatsapp_url,
+    tiktok: settings.tiktok_url
+  }}
+>
+  <Hero 
+    title={settings.hero_title}
+    desc={settings.hero_desc}
+    badge={settings.hero_badge}
+    ctaPrimary={settings.cta_primary}
+    ctaSecondary={settings.cta_secondary}
+    email={settings.email_kontak}
+    socials={{
+      github: settings.github_url,
+      instagram: settings.instagram_url,
+      linkedin: settings.linkedin_url,
+      whatsapp: settings.whatsapp_url,
+      tiktok: settings.tiktok_url
+    }}
+  />
+
+  <div class="gpu-accelerated"><Partners /></div>
+
+  <div class="gpu-accelerated"><Expertise /></div>
+
+  <div class="gpu-accelerated"><ProjectShowcase projects={projects} /></div>
+
+  <div class="gpu-accelerated"><Stats stats={stats} /></div>
+
+  <div class="gpu-accelerated"><SkillChart skills={keahlian} /></div>
+
+  <div class="gpu-accelerated"><ExperienceList experiences={pengalaman} /></div>
+
+  <div class="gpu-accelerated"><ExperienceFlow /></div>
+
+  <div class="gpu-accelerated"><CertificateList certificates={sertifikat} /></div>
+
+  <div class="gpu-accelerated"><OtherSkills /></div>
+
+  <div class="gpu-accelerated">
+    <BentoCTA 
+      email={settings.email_kontak}
+      ownerName={ownerName}
+    />
+  </div>
+
+  <div class="gpu-accelerated"><FAQ /></div>
+</LayoutPublic>
+
+<script>
+  import { initPageAnimations, initLenis } from "@/lib/public/page-animations";
+  import { initHero3D, initHeroTyping } from "@/lib/public/hero-animations";
+  import { initMagicBento } from "@/lib/public/bento-animations";
+  import { initSkillAnimations } from "@/lib/public/skill-animations";
+  import { initTextReveals } from "@/lib/public/interactive-utils";
+
+  function startAnimationEngine() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // PRIORITY 1: High Priority (Critical for feel)
+    requestAnimationFrame(() => {
+      if (!isMobile) initLenis(); // Only run Lenis on Desktop
+      initHero3D();
+      initHeroTyping();
+      initPageAnimations(); 
+    });
+
+    // PRIORITY 2: Background Tasks (Heaviest logic)
+    const backgroundTasks = () => {
+      requestAnimationFrame(() => {
+        if (!isMobile) {
+          initMagicBento(); 
+          initSkillAnimations();
+        }
+        initTextReveals();
+      });
+    };
+
+
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(backgroundTasks, { timeout: 1500 });
+    } else {
+      setTimeout(backgroundTasks, 400);
+    }
+  }
+
+  // Handle initialization
+  if (document.readyState === 'complete') {
+    startAnimationEngine();
+  } else {
+    window.addEventListener('load', startAnimationEngine);
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    if (document.readyState === 'complete') {
+      startAnimationEngine();
+    }
+  });
+</script>
+
+

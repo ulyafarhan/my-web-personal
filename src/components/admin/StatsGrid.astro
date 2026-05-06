@@ -1,0 +1,108 @@
+---
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+interface Stat {
+  label: string;
+  value: string | number;
+  desc: string;
+  icon: string;
+  color: string;
+  bg: string;
+}
+
+interface Props {
+  stats: Stat[];
+}
+
+const { stats } = Astro.props;
+---
+
+<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+  {
+    stats.map((stat) => (
+      <Card class="stats-card border-white/5 bg-white/[0.02] shadow-sm hover:bg-white/[0.04] transition-all">
+        <CardHeader class="flex flex-row items-center justify-between pb-2">
+          <CardTitle class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">
+            {stat.label}
+          </CardTitle>
+          <div
+            class:list={[
+              "flex h-8 w-8 items-center justify-center rounded-md",
+              stat.bg,
+              stat.color,
+            ]}
+          >
+            {stat.icon === "folder" && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+              </svg>
+            )}
+            {stat.icon === "eye" && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+            {stat.icon === "award" && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+              </svg>
+            )}
+            {stat.icon === "zap" && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div class="text-3xl font-black text-white">{stat.value}</div>
+          <p class="mt-1 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            {stat.desc}
+          </p>
+        </CardContent>
+      </Card>
+    ) )
+  }
+</div>

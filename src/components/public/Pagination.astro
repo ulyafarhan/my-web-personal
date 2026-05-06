@@ -1,0 +1,108 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+  accentColor?: 'cyan' | 'emerald';
+}
+
+const { currentPage, totalPages, baseUrl, accentColor = 'cyan' } = Astro.props;
+
+const colorMap = {
+  cyan: {
+    active: 'border-cyan-500/50 bg-cyan-500/10 text-cyan-400',
+    hover: 'hover:border-cyan-500/30 hover:bg-cyan-500/5 hover:text-cyan-400',
+    disabled: 'border-white/5 bg-white/[0.02] text-slate-600 pointer-events-none',
+    normal: 'border-white/5 bg-white/[0.02] text-slate-400',
+  },
+  emerald: {
+    active: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400',
+    hover: 'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400',
+    disabled: 'border-white/5 bg-white/[0.02] text-slate-600 pointer-events-none',
+    normal: 'border-white/5 bg-white/[0.02] text-slate-400',
+  },
+};
+
+const c = colorMap[accentColor];
+
+function buildUrl(page: number) {
+  return page === 1 ? baseUrl : `${baseUrl}?page=${page}`;
+}
+
+const maxVisible = 5;
+let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+if (endPage - startPage + 1 < maxVisible) {
+  startPage = Math.max(1, endPage - maxVisible + 1);
+}
+
+const pages: number[] = [];
+for (let i = startPage; i <= endPage; i++) {
+  pages.push(i);
+}
+---
+
+{totalPages > 1 && (
+  <nav class="mt-16 flex items-center justify-center gap-2 font-['Outfit']" aria-label="Navigasi Halaman">
+    <!-- Previous Button -->
+    <a
+      href={currentPage > 1 ? buildUrl(currentPage - 1) : undefined}
+      class:list={[
+        'flex h-11 w-11 items-center justify-center rounded-md border text-sm font-bold transition-all duration-300',
+        currentPage <= 1 ? c.disabled : `${c.normal} ${c.hover}`,
+      ]}
+      aria-disabled={currentPage <= 1}
+      aria-label="Halaman sebelumnya"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+
+    <!-- First Page + Ellipsis -->
+    {startPage > 1 && (
+      <>
+        <a href={buildUrl(1)} class:list={['flex h-11 w-11 items-center justify-center rounded-md border text-[12px] font-bold transition-all duration-300', c.normal, c.hover]}>1</a>
+        {startPage > 2 && <span class="px-1 text-slate-600 text-xs">…</span>}
+      </>
+    )}
+
+    <!-- Page Numbers -->
+    {pages.map(p => (
+      <a
+        href={buildUrl(p)}
+        class:list={[
+          'flex h-11 w-11 items-center justify-center rounded-md border text-[12px] font-bold transition-all duration-300',
+          p === currentPage ? c.active : `${c.normal} ${c.hover}`,
+        ]}
+        aria-current={p === currentPage ? 'page' : undefined}
+      >
+        {p}
+      </a>
+    ))}
+
+    <!-- Last Page + Ellipsis -->
+    {endPage < totalPages && (
+      <>
+        {endPage < totalPages - 1 && <span class="px-1 text-slate-600 text-xs">…</span>}
+        <a href={buildUrl(totalPages)} class:list={['flex h-11 w-11 items-center justify-center rounded-md border text-[12px] font-bold transition-all duration-300', c.normal, c.hover]}>{totalPages}</a>
+      </>
+    )}
+
+    <!-- Next Button -->
+    <a
+      href={currentPage < totalPages ? buildUrl(currentPage + 1) : undefined}
+      class:list={[
+        'flex h-11 w-11 items-center justify-center rounded-md border text-sm font-bold transition-all duration-300',
+        currentPage >= totalPages ? c.disabled : `${c.normal} ${c.hover}`,
+      ]}
+      aria-disabled={currentPage >= totalPages}
+      aria-label="Halaman berikutnya"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </a>
+
+    <!-- Page Info -->
+    <span class="ml-4 text-[11px] font-bold uppercase tracking-widest text-slate-600">
+      {currentPage} / {totalPages}
+    </span>
+  </nav>
+)}

@@ -1,0 +1,137 @@
+---
+import AdminIcon from "./AdminIcon.astro";
+
+interface Props {
+  user: any;
+  currentPath: string;
+}
+
+const { user, currentPath } = Astro.props;
+
+const menuGroups = [
+  {
+    label: "Utama",
+    items: [{ href: "/admin", label: "Dashboard", icon: "grid" }],
+  },
+  {
+    label: "Konten",
+    items: [
+      { href: "/admin/proyek", label: "Proyek", icon: "folder" },
+      { href: "/admin/pengalaman", label: "Pengalaman IT", icon: "timeline" },
+      { href: "/admin/sertifikat", label: "Sertifikat", icon: "award" },
+      { href: "/admin/keahlian", label: "Keahlian", icon: "barchart" },
+      { href: "/admin/tag", label: "Tag", icon: "tag" },
+    ],
+  },
+  {
+    label: "Sistem",
+    items: [
+      { href: "/admin/pengaturan", label: "Pengaturan", icon: "settings" },
+    ],
+  },
+];
+
+const isActive = (href: string) =>
+  href === "/admin" ? currentPath === href : currentPath.startsWith(href);
+---
+
+<aside
+  id="adminSidebar"
+  class="fixed inset-y-0 left-0 z-50 flex w-[var(--sidebar-width)] -translate-x-full flex-col border-r border-white/5 bg-[#020617] transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
+>
+  <div
+    class="flex h-[var(--header-height)] items-center border-b border-white/5 px-6 shrink-0"
+  >
+    <a href="/admin" class="flex items-center gap-3">
+      <div
+        class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(34,211,238,0.4)]"
+      >
+        <AdminIcon name="spark" />
+      </div>
+      <span class="text-sm font-black uppercase tracking-widest text-white"
+        >Antigravity</span
+      >
+    </a>
+    <button
+      class="ml-auto lg:hidden text-slate-500 hover:text-white"
+      data-close-sidebar
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg
+      >
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-8">
+    {
+      menuGroups.map((group) => (
+        <div class="space-y-2">
+          <h3 class="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+            {group.label}
+          </h3>
+          <nav class="space-y-1">
+            {group.items.map((item) => (
+              <a
+                href={item.href}
+                class:list={[
+                  "group flex items-center gap-3 rounded-l px-4 py-2.5 text-sm font-semibold transition-all duration-200",
+                  isActive(item.href)
+                    ? "bg-cyan-500/10 text-cyan-400 ring-1 ring-cyan-500/20"
+                    : "text-slate-400 hover:bg-white/[0.04] hover:text-white",
+                ]}
+              >
+                <AdminIcon
+                  name={item.icon}
+                  class:list={[
+                    "transition-colors",
+                    isActive(item.href)
+                      ? "text-cyan-400"
+                      : "text-slate-500 group-hover:text-cyan-400",
+                  ]}
+                />
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="border-t border-white/5 p-4 shrink-0">
+    <div
+      class="flex items-center gap-3 rounded-l bg-white/[0.03] p-3 ring-1 ring-white/10"
+    >
+      <div class="h-9 w-9 shrink-0 overflow-hidden rounded-l bg-white/10">
+        <img
+          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`}
+          alt="Avatar"
+        />
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-xs font-bold text-white">
+          {user?.email?.split("@")[0] || "Admin"}
+        </p>
+        <p
+          class="truncate text-[10px] text-slate-500 uppercase tracking-widest font-semibold"
+        >
+          Super Admin
+        </p>
+      </div>
+      <button
+        id="btnLogout"
+        class="text-slate-500 hover:text-red-400 transition-colors p-1.5 rounded-full hover:bg-red-500/10"
+      >
+        <AdminIcon name="logout" />
+      </button>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,73 @@
+---
+import type { Proyek } from "@/core/models/proyek";
+import ProjectCard from "./ProjectCard.astro";
+
+interface Props {
+  projects: Proyek[];
+}
+
+const { projects } = Astro.props;
+
+const config = {
+  glowColor: "132, 0, 255", 
+  spotlightRadius: 300
+};
+---
+
+<section id="karya" class="bento-section relative py-24 px-8 sm:px-12 lg:px-20 overflow-hidden bg-transparent">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-16 text-center">
+      <h2 class="text-reveal text-[10px] font-bold uppercase tracking-[0.4em] text-cyan-400">Galeri Kreasi</h2>
+      <h3 class="text-reveal mt-4 text-3xl font-black text-white sm:text-5xl tracking-tight">Kreasi digital terbaru</h3>
+    </div>
+
+    <!-- Global Spotlight -->
+    <div id="global-spotlight" class="pointer-events-none fixed z-50 mix-blend-screen opacity-0" style={`background: radial-gradient(circle, rgba(${config.glowColor}, 0.15) 0%, rgba(${config.glowColor}, 0.08) 15%, rgba(${config.glowColor}, 0.04) 25%, transparent 70%); width: 800px; height: 800px; border-radius: 50%; transform: translate(-50%, -50%);`}></div>
+
+    <div class="stagger-reveal card-responsive grid gap-4 lg:grid-cols-4" id="projectGrid">
+      {projects.map((project) => (
+        <ProjectCard project={project} glowColor={config.glowColor} />
+      ))}
+    </div>
+
+    <div class="mt-20 text-center">
+        <a href="/proyek" class="inline-flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-white hover:text-cyan-400 transition group">
+            Lihat Semua Karya
+            <div class="h-px w-8 bg-white/20 group-hover:w-12 group-hover:bg-cyan-400 transition-all duration-500"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bento-section {
+    --glow-x: 50%;
+    --glow-y: 50%;
+    --glow-intensity: 0;
+    --glow-radius: 300px;
+  }
+
+  .card-responsive {
+    grid-template-columns: 1fr;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 600px) {
+    .card-responsive { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 1024px) {
+    .card-responsive { grid-template-columns: repeat(4, 1fr); width: 100%; }
+    
+    :global(.project-card:nth-child(1)) { grid-column: span 2; grid-row: span 2; }
+    :global(.project-card:nth-child(8)) { grid-column: span 2; }
+  }
+</style>
+
+<script>
+  import { initMagicBento } from "@/lib/public/bento-animations";
+  initMagicBento();
+  document.addEventListener('astro:page-load', initMagicBento);
+</script>

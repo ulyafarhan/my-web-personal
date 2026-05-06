@@ -1,0 +1,195 @@
+---
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+
+interface Props {
+  proyek: any;
+}
+
+const { proyek } = Astro.props;
+---
+
+<div class="space-y-8">
+  <Card class="border-white/5 bg-white/[0.02]">
+    <CardHeader class="border-b border-white/5">
+      <CardTitle class="text-lg font-bold">Metadata Konten</CardTitle>
+    </CardHeader>
+    <CardContent class="grid gap-6 pt-6">
+      <div class="grid gap-2">
+        <Label
+          for="judul"
+          class="text-xs font-bold uppercase tracking-wider text-slate-400"
+          >Judul Arsitektur</Label
+        >
+        <Input
+          id="judul"
+          name="judul"
+          value={proyek?.judul ?? ""}
+          required
+          placeholder="Misal: Orchestrator Microservices dengan Go"
+          class="rounded-l border-white/10 bg-white/5 focus:ring-cyan-500/50"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="grid gap-2">
+          <Label
+            for="slug"
+            class="text-xs font-bold uppercase tracking-wider text-slate-400"
+            >Identifier Slug</Label
+          >
+          <Input
+            id="slug"
+            name="slug"
+            value={proyek?.slug ?? ""}
+            required
+            placeholder="orchestrator-microservices"
+            class="rounded-l border-white/10 bg-white/5"
+          />
+        </div>
+        <div class="grid gap-2">
+          <Label
+            for="status"
+            class="text-xs font-bold uppercase tracking-wider text-slate-400"
+            >Status Visibilitas</Label
+          >
+          <select
+            id="status"
+            name="status_publikasi"
+            class="flex h-10 w-full rounded-l border border-white/10 bg-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+          >
+            <option
+              value="0"
+              selected={proyek?.status_publikasi !== 1}
+              class="bg-slate-900">Draft Internal</option
+            >
+            <option
+              value="1"
+              selected={proyek?.status_publikasi === 1}
+              class="bg-slate-900">Publikasi Live</option
+            >
+          </select>
+        </div>
+      </div>
+
+      <div class="grid gap-2">
+        <Label
+          for="ringkasan"
+          class="text-xs font-bold uppercase tracking-wider text-slate-400"
+          >Abstraksi Eksekutif</Label
+        >
+        <Textarea
+          id="ringkasan"
+          name="ringkasan"
+          required
+          placeholder="Jelaskan core value proyek dalam 2-3 kalimat."
+          class="min-h-[100px] rounded-l border-white/10 bg-white/5 focus:ring-cyan-500/50"
+          defaultValue={proyek?.ringkasan ?? ""}
+        />
+      </div>
+
+      <div class="grid gap-2">
+        <Label class="text-xs font-bold uppercase tracking-wider text-slate-400"
+          >Dokumentasi Teknis Lengkap</Label
+        >
+        <div
+          class="overflow-hidden rounded-l border border-white/10 bg-white/[0.02]"
+        >
+          <!-- Tiptap Toolbar -->
+          <div
+            id="editorToolbar"
+            class="flex items-center gap-1 border-b border-white/5 bg-white/5 p-1"
+          >
+            {
+              [
+                {
+                  cmd: "bold",
+                  icon: "M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z",
+                  label: "Bold",
+                },
+                {
+                  cmd: "italic",
+                  icon: "M19 4h-9M14 20H5M15 4L9 20",
+                  label: "Italic",
+                },
+                {
+                  cmd: "bulletList",
+                  icon: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
+                  label: "List",
+                },
+                {
+                  cmd: "orderedList",
+                  icon: "M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M4 18h3",
+                  label: "Ordered List",
+                },
+              ].map((tool) => (
+                <button
+                  type="button"
+                  data-command={tool.cmd}
+                  title={tool.label}
+                  class="rounded-full p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d={tool.icon} />
+                  </svg>
+                </button>
+              ))
+            }
+          </div>
+          <div id="editor" class="min-h-[400px]"></div>
+          <textarea id="konten_html" name="konten_html" class="hidden"
+            >{proyek?.konten_html ?? ""}</textarea
+          >
+        </div>
+      </div>
+
+      <Separator class="bg-white/5" />
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="grid gap-2">
+          <Label
+            for="url_demo"
+            class="text-xs font-bold uppercase tracking-wider text-slate-400"
+            >Deploy URL</Label
+          >
+          <Input
+            id="url_demo"
+            name="url_demo"
+            type="url"
+            value={proyek?.url_demo ?? ""}
+            placeholder="https://example.com"
+            class="rounded-l border-white/10 bg-white/5"
+          />
+        </div>
+        <div class="grid gap-2">
+          <Label
+            for="url_repo"
+            class="text-xs font-bold uppercase tracking-wider text-slate-400"
+            >Git Repository</Label
+          >
+          <Input
+            id="url_repo"
+            name="url_repo"
+            type="url"
+            value={proyek?.url_repo ?? ""}
+            placeholder="https://github.com/..."
+            class="rounded-l border-white/10 bg-white/5"
+          />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+</div>

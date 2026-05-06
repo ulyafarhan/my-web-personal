@@ -1,0 +1,30 @@
+name = "portofolio"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portofolio-db"
+database_id = "local-dev"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "local-kv"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "portofolio-assets"
+
+[vars]
+ENVIRONMENT = "development"
+GROQ_API_KEY = "ganti_dengan_api_key_groq_anda"
+SITE_URL = "http://localhost:4321"
+BETTER_AUTH_SECRET = "ganti_dengan_secret_32_karakter_di_dashboard_cloudflare"
+ADMIN_EMAILS = "admin@admin.com"
+PUBLIC_R2_URL = "http://localhost:4321/uploads"
+
+[ai]
+binding = "AI"
+
+[[vectorize]]
+binding = "VECTOR_INDEX"
+index_name = "proyek-index"

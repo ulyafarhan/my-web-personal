@@ -1,0 +1,51 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { D1ProyekRepository } from "@/core/repositories/D1ProyekRepository";
+import ProjectFormMain from "@/components/admin/proyek/ProjectFormMain.astro";
+import ProjectFormSidebar from "@/components/admin/proyek/ProjectFormSidebar.astro";
+
+export const prerender = false;
+
+const db = Astro.locals.runtime.env.DB;
+const repo = new D1ProyekRepository(db);
+const id = Astro.url.searchParams.get("id");
+const tags = await repo.getAllTags();
+const proyek = id ? await repo.getById(id) : null;
+const selectedTagIds = proyek?.tags?.map((tag) => tag.id) ?? [];
+const isEdit = Boolean(proyek);
+---
+
+<LayoutAdmin
+  title={isEdit ? "Modifikasi Proyek" : "Entri Proyek Baru"}
+  subtitle="Gunakan editor kaya fitur untuk menyusun studi kasus teknis yang komprehensif."
+  breadcrumbs={[
+    { label: "Proyek", href: "/admin/proyek" },
+    { label: isEdit ? "Edit" : "Tambah" },
+  ]}
+>
+  <form id="formProyek" class="grid gap-8 xl:grid-cols-[1fr_380px]">
+    <ProjectFormMain proyek={proyek} />
+    <ProjectFormSidebar
+      proyek={proyek}
+      tags={tags}
+      selectedTagIds={selectedTagIds}
+      isEdit={isEdit}
+    />
+  </form>
+
+  <script>
+    import { ProyekEditor } from "@/lib/admin/proyek-editor";
+    const form = document.getElementById("formProyek") as HTMLFormElement;
+    if (form) new ProyekEditor(form);
+  </script>
+
+  <style is:global>
+    .tiptap p.is-editor-empty:first-child::before {
+      content: attr(data-placeholder);
+      float: left;
+      color: #64748b;
+      pointer-events: none;
+      height: 0;
+    }
+  </style>
+</LayoutAdmin>

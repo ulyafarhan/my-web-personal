@@ -1,0 +1,71 @@
+---
+import CountUp from "@/components/ui/CountUp.vue";
+
+interface Props {
+  stats: { value: string; label: string }[];
+}
+
+const { stats } = Astro.props;
+
+/**
+ * Utility to extract number and suffix (e.g., "50+" -> { num: 50, suffix: "+" })
+ */
+const parseStat = (val: string) => {
+  const numMatch = val.match(/(\d+)/);
+  const suffixMatch = val.match(/[^\d]+/);
+  return {
+    num: numMatch ? parseInt(numMatch[0]) : 0,
+    suffix: suffixMatch ? suffixMatch[0] : ""
+  };
+};
+
+const processedStats = stats.map(s => ({
+  ...s,
+  ...parseStat(s.value || "0")
+}));
+
+// Added a 4th default stat for symmetry if needed, or just map the 3 + 1
+---
+
+<section class="reveal py-24 px-8 sm:px-12 lg:px-20 border-y border-white/5 bg-white/[0.01]">
+  <div class="mx-auto max-w-7xl">
+    <div class="grid grid-cols-2 gap-12 md:grid-cols-4">
+      {processedStats.map(s => (
+        <div class="group relative text-center">
+          <div class="relative flex flex-col items-center">
+            <div class="flex items-baseline gap-0.5">
+               <CountUp 
+                 client:visible
+                 to={s.num}
+                 className="text-4xl font-black text-white sm:text-6xl tracking-tighter"
+               />
+               <span class="text-xl font-bold text-cyan-400 sm:text-2xl">{s.suffix}</span>
+            </div>
+            <p class="mt-4 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 group-hover:text-cyan-400 transition-colors">
+              {s.label}
+            </p>
+          </div>
+        </div>
+      ))}
+      
+      <!-- Default Satisfaction Stat -->
+      <div class="group relative text-center">
+        <div class="relative flex flex-col items-center">
+          <div class="flex items-baseline gap-0.5">
+             <CountUp 
+               client:visible
+               to={99}
+               className="text-4xl font-black text-white sm:text-6xl tracking-tighter"
+             />
+             <span class="text-xl font-bold text-cyan-400 sm:text-2xl">%</span>
+          </div>
+          <p class="mt-4 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 group-hover:text-cyan-400 transition-colors">
+            Tingkat Keberhasilan
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+

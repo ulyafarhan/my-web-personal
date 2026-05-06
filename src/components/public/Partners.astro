@@ -1,0 +1,114 @@
+---
+const partners = [
+  { name: "Laravel", slug: "laravel" },
+  { name: "PHP", slug: "php" },
+  { name: "Filament", slug: "filamentphp" },
+  { name: "Inertia.js", slug: "inertia" },
+  { name: "Next.js", slug: "nextdotjs" },
+  { name: "Node.js", slug: "nodedotjs" },
+  { name: "MySQL", slug: "mysql" },
+  { name: "Flutter", slug: "flutter" },
+  { name: "Nuxt", slug: "nuxt" },
+  { name: "Vue.js", slug: "vuedotjs" },
+  { name: "Astro", slug: "astro" },
+  { name: "Cloudflare", slug: "cloudflare" },
+  { name: "Tailwind", slug: "tailwindcss" },
+  { name: "DigitalOcean", slug: "digitalocean" },
+  { name: "TypeScript", slug: "typescript" },
+  { name: "PostgreSQL", slug: "postgresql" },
+  { name: "Google Cloud", slug: "googlecloud" },
+  { name: "Docker", slug: "docker" },
+  { name: "Kubernetes", slug: "kubernetes" },
+];
+---
+
+<section
+  class="py-10 overflow-hidden bg-[#050505] relative border-y border-white/5"
+>
+  <div class="container mx-auto px-6 mb-8 text-center">
+    <h2
+      class="text-[10px] font-bold tracking-[0.3em] text-cyan-500/60 uppercase"
+    >
+      Tech Stack & Ecosystem
+    </h2>
+  </div>
+
+  <div class="relative flex overflow-hidden group">
+    <!-- Container for Seamless Loop -->
+    <div class="flex whitespace-nowrap animate-marquee-infinite">
+      <!-- Original Set -->
+      <div class="flex items-center">
+        {
+          partners.map((partner) => (
+            <div class="mx-12 flex items-center gap-4 group/item cursor-default">
+              <div class="relative w-12 h-12 flex items-center justify-center grayscale group-hover/item:grayscale-0 transition-all duration-500 opacity-30 group-hover/item:opacity-100 scale-90 group-hover/item:scale-110">
+                <img
+                  src={`https://cdn.simpleicons.org/${partner.slug}`}
+                  alt={partner.name}
+                  class="w-10 h-10 object-contain"
+                  loading="lazy"
+                />
+              </div>
+              <span class="text-2xl font-black tracking-tighter text-white/10 group-hover/item:text-white/100 transition-all duration-500">
+                {partner.name}
+              </span>
+            </div>
+          ))
+        }
+      </div>
+
+      <!-- Duplicate Set for Seamless Transition -->
+      <div class="flex items-center">
+        {
+          partners.map((partner) => (
+            <div class="mx-12 flex items-center gap-4 group/item cursor-default">
+              <div class="relative w-12 h-12 flex items-center justify-center grayscale group-hover/item:grayscale-0 transition-all duration-500 opacity-30 group-hover/item:opacity-100 scale-90 group-hover/item:scale-110">
+                <img
+                  src={`https://cdn.simpleicons.org/${partner.slug}`}
+                  alt={partner.name}
+                  class="w-10 h-10 object-contain"
+                  loading="lazy"
+                />
+              </div>
+              <span class="text-2xl font-black tracking-tighter text-white/10 group-hover/item:text-white/100 transition-all duration-500">
+                {partner.name}
+              </span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Gradient overlays for smooth fade -->
+    <div
+      class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050505] to-transparent z-10 pointer-events-none"
+    >
+    </div>
+    <div
+      class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050505] to-transparent z-10 pointer-events-none"
+    >
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes marquee-infinite {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee-infinite {
+    display: flex;
+    width: max-content;
+    animation: marquee-infinite 60s linear infinite;
+  }
+
+  /* Pause on hover */
+  .group:hover .animate-marquee-infinite {
+    animation-play-state: paused;
+  }
+</style>

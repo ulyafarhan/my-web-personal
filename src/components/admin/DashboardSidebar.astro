@@ -1,0 +1,148 @@
+---
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+interface Props {
+  recommendation: string | null;
+}
+
+const { recommendation } = Astro.props;
+
+const quickLinks = [
+  {
+    label: "Update Landing Page",
+    desc: "Ubah teks hero dan CTA.",
+    href: "/admin/pengaturan",
+    icon: "settings",
+  },
+  {
+    label: "Manajemen Sertifikat",
+    desc: "Kelola kredensial & lisensi.",
+    href: "/admin/sertifikat",
+    icon: "award",
+  },
+  {
+    label: "Rekam Jejak IT",
+    desc: "Edit pengalaman profesional.",
+    href: "/admin/pengalaman",
+    icon: "zap",
+  },
+  {
+    label: "Analisa Tagging",
+    desc: "Kelola metadata teknologi.",
+    href: "/admin/tag",
+    icon: "tag",
+  },
+];
+---
+
+<aside class="dashboard-sidebar-section space-y-8">
+  {recommendation && (
+    <Card class="border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm">
+      <CardHeader class="pb-2">
+        <CardTitle class="text-xs font-black uppercase tracking-[0.2em] text-emerald-400">
+          Saran Strategis
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p class="text-sm leading-relaxed text-emerald-100/70 italic">
+          "{recommendation}"
+        </p>
+      </CardContent>
+    </Card>
+  )}
+
+  <Card class="border-white/5 bg-white/[0.01]">
+    <CardHeader>
+      <CardTitle
+        class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500"
+        >Pintasan Cepat</CardTitle
+      >
+    </CardHeader>
+    <CardContent class="grid gap-3">
+      {
+        quickLinks.map((item) => (
+          <a
+            href={item.href}
+            class="group block rounded-md border border-white/5 bg-white/[0.02] p-4 transition-all hover:bg-white/[0.06] active:scale-[0.98]"
+          >
+            <div class="flex items-center gap-3">
+              <div class="text-slate-500 group-hover:text-cyan-400 transition-colors">
+                {item.icon === "settings" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+                {item.icon === "tag" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
+                    <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" />
+                  </svg>
+                )}
+                {item.icon === "award" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="8" r="6" />
+                    <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+                  </svg>
+                )}
+                {item.icon === "zap" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                )}
+              </div>
+              <div class="min-w-0 flex-1">
+                <span class="block text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">
+                  {item.label}
+                </span>
+                <p class="truncate text-[10px] font-medium text-slate-500 uppercase tracking-widest">
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </CardContent>
+  </Card>
+</aside>

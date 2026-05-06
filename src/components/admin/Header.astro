@@ -1,0 +1,88 @@
+---
+interface Props {
+  breadcrumbs: { label: string; href?: string }[];
+}
+
+const { breadcrumbs } = Astro.props;
+const allBreadcrumbs = [{ label: "Admin", href: "/admin" }, ...breadcrumbs];
+---
+
+<header class="sticky top-0 z-40 glass-effect border-b border-white/5 shrink-0">
+  <div
+    class="flex h-[var(--header-height)] items-center justify-between px-4 sm:px-6 lg:px-8"
+  >
+    <div class="flex items-center gap-4">
+      <button
+        class="lg:hidden p-2 rounded-full bg-white/5 text-slate-400"
+        data-open-sidebar
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><line x1="4" x2="20" y1="12" y2="12"></line><line
+            x1="4"
+            x2="20"
+            y1="6"
+            y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg
+        >
+      </button>
+
+      <nav
+        class="hidden md:flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500"
+      >
+        {
+          allBreadcrumbs.map((crumb, idx) => (
+            <>
+              {idx > 0 && <span class="text-slate-700">/</span>}
+              {crumb.href ? (
+                <a
+                  href={crumb.href}
+                  class="hover:text-cyan-400 transition-colors"
+                >
+                  {crumb.label}
+                </a>
+              ) : (
+                <span class="text-white">{crumb.label}</span>
+              )}
+            </>
+          ))
+        }
+      </nav>
+    </div>
+
+    <div class="flex items-center gap-3 sm:gap-4">
+      <a
+        href="/"
+        target="_blank"
+        class="flex h-9 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 sm:px-4 text-[10px] font-black uppercase tracking-widest text-white transition hover:bg-white/10"
+      >
+        <span class="hidden sm:inline">Lihat Situs</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path
+            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+          ></path><polyline points="15 3 21 3 21 9"></polyline><line
+            x1="10"
+            x2="21"
+            y1="14"
+            y2="3"></line></svg
+        >
+      </a>
+    </div>
+  </div>
+</header>

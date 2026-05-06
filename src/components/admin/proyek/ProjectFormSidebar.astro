@@ -1,0 +1,163 @@
+---
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+interface Tag {
+  id: string;
+  nama: string;
+}
+
+interface Props {
+  proyek: any;
+  tags: Tag[];
+  selectedTagIds: string[];
+  isEdit: boolean;
+}
+
+const { proyek, tags, selectedTagIds, isEdit } = Astro.props;
+---
+
+<aside class="space-y-8">
+  <Card class="border-white/5 bg-white/[0.02]">
+    <CardHeader>
+      <CardTitle class="text-sm font-bold uppercase tracking-widest"
+        >Asset Visual</CardTitle
+      >
+    </CardHeader>
+    <CardContent>
+      <div
+        class="group relative aspect-video overflow-hidden rounded-l border border-dashed border-white/10 bg-white/5 transition-colors hover:border-cyan-500/30"
+      >
+        <img
+          id="coverPreview"
+          src={proyek?.url_gambar_sampul || ""}
+          alt=""
+          class:list={[
+            "h-full w-full object-cover transition-transform group-hover:scale-105",
+            !proyek?.url_gambar_sampul && "hidden",
+          ]}
+        />
+        <div
+          id="coverEmpty"
+          class:list={[
+            "grid h-full place-items-center text-center p-6",
+            proyek?.url_gambar_sampul && "hidden",
+          ]}
+        >
+          <div class="space-y-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="mx-auto text-slate-600"
+              ><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle
+                cx="9"
+                cy="9"
+                r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+              ></path></svg
+            >
+            <p
+              class="text-[10px] font-bold uppercase tracking-widest text-slate-500"
+            >
+              Unggah Gambar Sampul
+            </p>
+          </div>
+        </div>
+        <input
+          id="coverFile"
+          type="file"
+          accept="image/*"
+          class="absolute inset-0 cursor-pointer opacity-0"
+        />
+      </div>
+      <input
+        id="url_gambar_sampul"
+        name="url_gambar_sampul"
+        type="hidden"
+        value={proyek?.url_gambar_sampul ?? ""}
+      />
+    </CardContent>
+  </Card>
+
+  <Card class="border-white/5 bg-white/[0.02]">
+    <CardHeader>
+      <CardTitle class="text-sm font-bold uppercase tracking-widest"
+        >Stack Teknologi</CardTitle
+      >
+    </CardHeader>
+    <CardContent>
+      <div class="flex flex-wrap gap-2">
+        {
+          tags.map((tag) => (
+            <label class="group relative cursor-pointer">
+              <input
+                class="peer sr-only"
+                type="checkbox"
+                name="tag_ids"
+                value={tag.id}
+                checked={selectedTagIds.includes(tag.id)}
+              />
+              <span class="block rounded-l border border-white/10 bg-white/5 px-3 py-2 text-[11px] font-bold text-slate-400 transition-all peer-checked:border-cyan-500/50 peer-checked:bg-cyan-500/10 peer-checked:text-cyan-400 hover:border-white/20">
+                {tag.nama}
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </CardContent>
+  </Card>
+
+  <Card
+    id="linterPanel"
+    class="hidden border-cyan-500/20 bg-cyan-500/5 shadow-[0_0_30px_rgba(34,211,238,0.05)]"
+  >
+    <CardHeader class="pb-2">
+      <CardTitle
+        class="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-400"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"
+          ></path><path d="m9 14 3 3 7-7"></path></svg
+        >
+        Expert Linter 3.0
+      </CardTitle>
+    </CardHeader>
+    <CardContent id="linterResults" class="space-y-3">
+      <div class="h-4 w-full animate-pulse rounded bg-cyan-500/10"></div>
+    </CardContent>
+  </Card>
+
+  <div class="sticky bottom-8 space-y-4">
+    <Button
+      id="btnSubmit"
+      type="submit"
+      class="h-12 w-full rounded-full bg-cyan-500 font-black uppercase tracking-widest text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all hover:bg-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] active:scale-[0.98]"
+    >
+      {isEdit ? "Simpan Perubahan" : "Terbitkan Proyek"}
+    </Button>
+    <Button
+      as="a"
+      href="/admin/proyek"
+      variant="outline"
+      class="w-full rounded-full border-white/10 bg-white/5 font-bold hover:bg-white/10"
+    >
+      Batalkan
+    </Button>
+    <p id="formMessage" class="hidden p-4 rounded-l text-xs font-medium"></p>
+  </div>
+</aside>

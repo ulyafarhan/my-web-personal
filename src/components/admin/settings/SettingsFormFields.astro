@@ -1,0 +1,57 @@
+---
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+interface Field {
+  key: string;
+  label: string;
+  group: string;
+  type: string;
+}
+
+interface Props {
+  fields: Field[];
+  config: Record<string, string>;
+}
+
+const { fields, config } = Astro.props;
+---
+
+<div class="grid gap-6 sm:grid-cols-2">
+  {
+    fields.map((field) => (
+      <div
+        class:list={[
+          "space-y-2",
+          field.type === "textarea" && "sm:col-span-2",
+        ]}
+      >
+        <Label
+          for={field.key}
+          class="text-[11px] font-black uppercase tracking-widest text-slate-500"
+        >
+          {field.label}
+        </Label>
+        {field.type === "textarea" ? (
+          <Textarea
+            id={field.key}
+            name={field.key}
+            data-group={field.group}
+            defaultValue={config[field.key] ?? ""}
+            rows={4}
+            class="rounded-l border-white/5 bg-white/5 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10"
+          />
+        ) : (
+          <Input
+            id={field.key}
+            name={field.key}
+            data-group={field.group}
+            defaultValue={config[field.key] ?? ""}
+            class="rounded-l border-white/5 bg-white/5 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10"
+          />
+        )}
+      </div>
+    ))
+  }
+</div>

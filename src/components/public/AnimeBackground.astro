@@ -1,0 +1,78 @@
+---
+// src/components/public/AnimeBackground.astro
+---
+<div class="gsap-bg-container absolute inset-0 -z-10 overflow-hidden pointer-events-none opacity-40 hidden lg:block">
+  <div class="grid-container flex flex-wrap gap-1 justify-center items-center h-full w-full opacity-20">
+    {Array.from({ length: 40 }).map(() => (
+      <div class="gsap-square w-8 h-8 rounded-sm bg-white/5 border border-white/5 will-change-transform"></div>
+    ))}
+  </div>
+</div>
+
+<script>
+  import { gsap } from "gsap";
+
+  function initGSAPBackground() {
+    const squares = document.querySelectorAll('.gsap-square');
+    if (!squares.length) return;
+
+    // Create a simpler, lighter animation with GSAP
+    const tl = gsap.timeline({
+      repeat: -1,
+      yoyo: true,
+      paused: true
+    });
+
+    tl.to(squares, {
+      scale: 0.5,
+      opacity: 0.1,
+      duration: 2,
+      stagger: {
+        amount: 2,
+        grid: [10, 4],
+        from: "center"
+      },
+      ease: "sine.inOut"
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tl.play();
+        } else {
+          tl.pause();
+        }
+      });
+    }, { threshold: 0.01 });
+
+    const container = document.querySelector('.gsap-bg-container');
+    if (container) observer.observe(container);
+  }
+
+  function init() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) return; // Completely skip for mobile performance
+
+    const run = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => initGSAPBackground());
+      } else {
+        setTimeout(initGSAPBackground, 500);
+      }
+    };
+
+    if (document.readyState === 'complete') run();
+    else window.addEventListener('load', run);
+  }
+
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .grid-container {
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+  }
+</style>

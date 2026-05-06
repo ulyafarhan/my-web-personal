@@ -1,0 +1,90 @@
+---
+import LayoutAuth from '@/layouts/LayoutAuth.astro';
+
+export const prerender = false;
+---
+
+<LayoutAuth title="Masuk Admin">
+  <form id="formLogin" class="space-y-5">
+    <div id="errorMsg" class="hidden rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-100"></div>
+
+    <div>
+      <label for="username" class="mb-2 block text-sm font-semibold text-slate-200">Username</label>
+      <input
+        type="text"
+        id="username"
+        autocomplete="username"
+        required
+        class="w-full rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300 focus:ring-4 focus:ring-cyan-300/10"
+        placeholder="admin"
+      />
+    </div>
+
+    <div>
+      <label for="password" class="mb-2 block text-sm font-semibold text-slate-200">Password</label>
+      <input
+        type="password"
+        id="password"
+        autocomplete="current-password"
+        required
+        class="w-full rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300 focus:ring-4 focus:ring-cyan-300/10"
+        placeholder="Minimal 8 karakter"
+      />
+    </div>
+
+    <button
+      type="submit"
+      id="btnSubmit"
+      class="w-full rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      Masuk ke Panel
+    </button>
+
+    <div class="text-center">
+      <a href="/" class="text-sm font-medium text-slate-400 transition hover:text-white">Kembali ke beranda</a>
+    </div>
+  </form>
+
+  <script>
+    const form = document.getElementById('formLogin');
+    const errorMsg = document.getElementById('errorMsg');
+    const btn = document.getElementById('btnSubmit');
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') === 'akses-admin' && errorMsg) {
+      errorMsg.textContent = 'Akun berhasil masuk, tetapi tidak terdaftar sebagai admin.';
+      errorMsg.classList.remove('hidden');
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!btn || !errorMsg) return;
+
+      const username = (document.getElementById('username') as HTMLInputElement)?.value;
+      const password = (document.getElementById('password') as HTMLInputElement)?.value;
+
+      btn.setAttribute('disabled', 'true');
+      btn.textContent = 'Memeriksa sesi...';
+      errorMsg.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json() as any;
+        if (!res.ok) {
+          throw new Error(data.message || 'Username atau password belum sesuai.');
+        }
+
+        window.location.href = '/admin';
+      } catch (err) {
+        errorMsg.textContent = err instanceof Error ? err.message : 'Gagal masuk ke panel admin.';
+        errorMsg.classList.remove('hidden');
+        btn.removeAttribute('disabled');
+        btn.textContent = 'Masuk ke Panel';
+      }
+    });
+  </script>
+</LayoutAuth>

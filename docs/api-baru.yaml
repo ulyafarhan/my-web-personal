@@ -1,0 +1,476 @@
+openapi: 3.0.3
+info:
+  title: my-web-personal API
+  version: 2.0.0
+  description: Kontrak API komprehensif untuk sistem portofolio IT personal berbasis Cloudflare Workers, Astro SSR, dan Better Auth. Termasuk rekomendasi API v3.0.
+servers:
+  - url: /api
+    description: Base path untuk semua rute API
+paths:
+  # ==========================================
+  # DOMAIN: AUTENTIKASI (BETTER AUTH & LEGACY)
+  # ==========================================
+  /auth/{all}:
+    get:
+      summary: Better Auth Catch-all GET
+      description: Menangani rute internal Better Auth (mis. validasi sesi, OAuth callback).
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Better Auth Catch-all POST
+      description: Menangani rute internal Better Auth (mis. login email, logout).
+      responses:
+        '200':
+          description: OK
+  /auth/login:
+    post:
+      summary: Legacy Admin Login
+      description: Otentikasi administrator menggunakan kredensial legacy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login berhasil, sesi dibuat.
+  /auth/logout:
+    post:
+      summary: Admin Logout
+      description: Menghancurkan sesi pengguna saat ini.
+      responses:
+        '200':
+          description: Sesi dihapus.
+
+  # ==========================================
+  # DOMAIN: KONTEN PORTOFOLIO (ADMIN)
+  # Diperlukan autentikasi sesi yang valid.
+  # ==========================================
+  /admin/proyek:
+    get:
+      summary: Daftar Proyek
+      description: Mengambil semua entitas proyek IT.
+      responses:
+        '200':
+          description: Berhasil.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardSuccess'
+    post:
+      summary: Buat Proyek Baru
+      description: Menambahkan rekaman proyek baru beserta relasi tag.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProyekPayload'
+      responses:
+        '201':
+          description: Proyek berhasil dibuat.
+  /admin/proyek/{id}:
+    get:
+      summary: Detail Proyek
+      description: Mengambil proyek spesifik berdasarkan ID ULID.
+      responses:
+        '200':
+          description: Berhasil.
+    put:
+      summary: Perbarui Proyek
+      description: Memperbarui data proyek spesifik.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProyekPayload'
+      responses:
+        '200':
+          description: Proyek diperbarui.
+    delete:
+      summary: Hapus Proyek
+      description: Menghapus proyek dari basis data secara permanen.
+      responses:
+        '200':
+          description: Proyek dihapus.
+
+  /admin/pengalaman:
+    get:
+      summary: Daftar Pengalaman
+      description: Mengambil rekam jejak karir/pengalaman IT.
+      responses:
+        '200':
+          description: Berhasil.
+    post:
+      summary: Tambah Pengalaman
+      description: Menambahkan pengalaman profesional.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PengalamanPayload'
+      responses:
+        '201':
+          description: Pengalaman ditambahkan.
+  /admin/pengalaman/{id}:
+    put:
+      summary: Perbarui Pengalaman
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PengalamanPayload'
+      responses:
+        '200':
+          description: Diperbarui.
+    delete:
+      summary: Hapus Pengalaman
+      responses:
+        '200':
+          description: Dihapus.
+
+  /admin/sertifikat:
+    get:
+      summary: Daftar Sertifikat
+      description: Mengambil daftar sertifikasi teknis.
+      responses:
+        '200':
+          description: Berhasil.
+    post:
+      summary: Tambah Sertifikat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SertifikatPayload'
+      responses:
+        '201':
+          description: Ditambahkan.
+  /admin/sertifikat/{id}:
+    put:
+      summary: Perbarui Sertifikat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SertifikatPayload'
+      responses:
+        '200':
+          description: Diperbarui.
+    delete:
+      summary: Hapus Sertifikat
+      responses:
+        '200':
+          description: Dihapus.
+
+  # ==========================================
+  # DOMAIN: KLASIFIKASI & SISTEM PAKAR (ADMIN)
+  # ==========================================
+  /admin/tag:
+    get:
+      summary: Daftar Tag
+      description: Mengambil semua tag teknologi yang tersedia.
+      responses:
+        '200':
+          description: Berhasil.
+    post:
+      summary: Buat Tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagPayload'
+      responses:
+        '201':
+          description: Tag dibuat.
+  /admin/tag/{id}:
+    put:
+      summary: Perbarui Tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagPayload'
+      responses:
+        '200':
+          description: Tag diperbarui.
+    delete:
+      summary: Hapus Tag
+      responses:
+        '200':
+          description: Tag dihapus.
+
+  /admin/aturan-pakar:
+    get:
+      summary: Daftar Aturan Inferensi
+      description: Mengambil basis pengetahuan untuk AI.
+      responses:
+        '200':
+          description: Berhasil.
+    post:
+      summary: Buat Aturan Pakar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AturanPakarPayload'
+      responses:
+        '201':
+          description: Aturan dibuat.
+  /admin/aturan-pakar/{id}:
+    put:
+      summary: Perbarui Aturan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AturanPakarPayload'
+      responses:
+        '200':
+          description: Diperbarui.
+    delete:
+      summary: Hapus Aturan
+      responses:
+        '200':
+          description: Dihapus.
+
+  /admin/pengaturan:
+    get:
+      summary: Daftar Pengaturan Global
+      description: Konfigurasi sistem dinamis (Key-Value).
+      responses:
+        '200':
+          description: Berhasil.
+    put:
+      summary: Perbarui Pengaturan (Batch)
+      description: Memperbarui beberapa konfigurasi sekaligus.
+      responses:
+        '200':
+          description: Diperbarui.
+
+  # ==========================================
+  # DOMAIN: STORAGE & MANAJEMEN ASET (R2)
+  # ==========================================
+  /admin/assets/upload:
+    post:
+      summary: Direct Upload ke R2
+      description: Endpoint multipart/form-data untuk pass-through file ke bucket.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Berkas terunggah, URL dikembalikan.
+  /admin/upload-url:
+    post:
+      summary: Generate Pre-signed URL
+      description: Menghasilkan URL otorisasi sementara untuk unggahan langsung sisi klien.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: string
+                contentType:
+                  type: string
+      responses:
+        '200':
+          description: Pre-signed URL berhasil dibuat.
+
+  # ==========================================
+  # DOMAIN: PUBLIK & INTELLIGENCE
+  # ==========================================
+  /chatbot:
+    post:
+      summary: LLM Chatbot Engine
+      description: Interaksi pengguna dengan mesin inferensi/Llama 3.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      responses:
+        '200':
+          description: Mengembalikan teks balasan dari AI.
+
+  # ==========================================
+  # REKOMENDASI KONTRAK API BARU (V3.0)
+  # Endpoint operasional untuk skalabilitas.
+  # ==========================================
+  /analytics/track:
+    post:
+      summary: Ingesti Telemetri (Privacy-First)
+      description: Merekam agregasi tampilan (PageView) tanpa mengumpulkan PII.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event_type:
+                  type: string
+                  example: "page_view"
+                entity_id:
+                  type: string
+                  example: "ulid-proyek-tertentu"
+                referrer:
+                  type: string
+                user_agent_hash:
+                  type: string
+      responses:
+        '200':
+          description: Telemetri tercatat.
+
+  /admin/system/vectorize:
+    post:
+      summary: Update Vektor RAG (Webhook/Hook)
+      description: Dipanggil asinkron saat proyek diubah untuk memperbarui vektor pencarian semantik (Cloudflare Vectorize).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                proyek_id:
+                  type: string
+                action:
+                  type: string
+                  enum: [upsert, delete]
+      responses:
+        '200':
+          description: Vektor diperbarui.
+
+  /system/health:
+    get:
+      summary: Pemeriksaan Kesehatan & Circuit Breaker
+      description: Memantau status latensi D1 dan kesiapan (readiness) koneksi LLM Groq.
+      responses:
+        '200':
+          description: Status operasional komponen sistem.
+
+components:
+  schemas:
+    StandardSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        data:
+          type: object
+    StandardError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+        code:
+          type: integer
+    ProyekPayload:
+      type: object
+      properties:
+        judul:
+          type: string
+        slug:
+          type: string
+        ringkasan:
+          type: string
+        konten_html:
+          type: string
+        url_gambar_sampul:
+          type: string
+        status_publikasi:
+          type: integer
+        meta_seo:
+          type: string
+        meta_geo:
+          type: string
+        ai_tags:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    PengalamanPayload:
+      type: object
+      properties:
+        peran:
+          type: string
+        organisasi:
+          type: string
+        periode:
+          type: string
+        deskripsi:
+          type: string
+        urutan:
+          type: integer
+        metadata:
+          type: string
+    SertifikatPayload:
+      type: object
+      properties:
+        nama:
+          type: string
+        penerbit:
+          type: string
+        tahun:
+          type: string
+        url_kredensial:
+          type: string
+        urutan:
+          type: integer
+    TagPayload:
+      type: object
+      properties:
+        nama:
+          type: string
+        slug:
+          type: string
+    AturanPakarPayload:
+      type: object
+      properties:
+        kondisi_tag:
+          type: string
+        rekomendasi:
+          type: string
+        bobot:
+          type: integer
+        aktif:
+          type: integer

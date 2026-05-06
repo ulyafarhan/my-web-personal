@@ -1,0 +1,69 @@
+---
+import NavLinks from "./NavLinks.astro";
+import MobileMenu from "./MobileMenu.astro";
+
+interface Props {
+  ownerName: string;
+  email: string;
+}
+
+const { ownerName, email } = Astro.props;
+---
+
+<nav id="main-nav" class="fixed left-0 right-0 top-0 z-[100] px-4 pt-4 sm:px-8 lg:px-16 pointer-events-none font-['Outfit'] transition-all duration-500">
+  <div class="nav-glass mx-auto flex h-12 max-w-5xl items-center justify-between rounded-full border border-white/[0.06] bg-white/[0.03] px-6 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-2xl pointer-events-auto transition-all duration-500">
+    
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-2.5 group">
+      <div class="flex h-7 w-7 items-center justify-center rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-110">
+         <img src="/logo.svg" alt={`${ownerName} logo`} class="h-7 w-7 invert opacity-90 group-hover:opacity-100 transition-opacity" />
+      </div>
+      <span class="text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.15em] text-white/80 group-hover:text-white transition-colors">{ownerName}</span>
+    </a>
+    
+    <NavLinks />
+
+    <!-- Right Actions -->
+    <div class="flex items-center gap-2">
+      <!-- Theme Toggle -->
+      <button id="theme-toggle" class="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-white/60 transition-colors duration-300 hover:text-white hover:bg-white/[0.08]" aria-label="Toggle Theme">
+        <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="block"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+
+      <a href={`mailto:${email}`} class="hidden rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-white/60 transition-colors duration-300 hover:text-white sm:inline-flex">
+        Hubungi
+      </a>
+      
+      <!-- Mobile Menu Trigger -->
+      <button id="mobile-menu-btn" class="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.04] text-white/60 transition-all duration-300 hover:text-white md:hidden" aria-label="Toggle Menu">
+        <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+        <svg id="close-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <MobileMenu email={email} />
+</nav>
+
+<style>
+  .nav-glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  #main-nav.scrolled .nav-glass {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 12px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  :global(.nav-link.active) { color: rgb(34, 211, 238); }
+  :global(#dropdown-chevron.open) { transform: rotate(180deg); }
+</style>
+
+<script>
+  import { initNavbar } from "@/lib/public/navbar-logic";
+  initNavbar();
+  document.addEventListener('astro:page-load', initNavbar);
+</script>

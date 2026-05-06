@@ -1,0 +1,242 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { getPengalamanIT } from "@/lib/content";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+export const prerender = false;
+
+const pengalaman = await getPengalamanIT(Astro.locals.runtime.env.DB, 100);
+---
+
+<LayoutAdmin
+  title="Rekam Jejak Teknis"
+  subtitle="Kelola pengalaman profesional, riset teknis, kontribusi open source, dan eksperimen rekayasa perangkat lunak."
+  breadcrumbs={[{ label: 'Pengalaman IT' }]}
+>
+  <div class="grid gap-8 lg:grid-cols-[1fr_420px]">
+    <!-- List Section -->
+    <div class="space-y-6">
+      <Card class="border-white/5 bg-white/[0.01]">
+        <CardHeader class="border-b border-white/5 pb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <CardTitle class="text-xl font-bold text-white">Daftar Pengalaman</CardTitle>
+              <CardDescription>Riwayat teknis yang memperkuat kredibilitas Anda.</CardDescription>
+            </div>
+            <span class="rounded-full bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-400 ring-1 ring-amber-500/20">
+              {pengalaman.length} Entri
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent class="p-0">
+          <div class="divide-y divide-white/5">
+            {pengalaman.length === 0 ? (
+              <div class="p-12 text-center text-sm text-slate-500 italic">Belum ada pengalaman terdaftar.</div>
+            ) : (
+              pengalaman.map((item) => (
+                <div class="group p-6 hover:bg-white/[0.02] transition-all">
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-start gap-4">
+                      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-white/5 text-slate-400 group-hover:bg-amber-500/10 group-hover:text-amber-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12h.01"/><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M22 13a18.15 18.15 0 0 1-20 0"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+                      </div>
+                      <div>
+                        <h3 class="font-bold text-white group-hover:text-amber-400 transition-colors text-lg">{item.peran}</h3>
+                        <div class="flex flex-wrap items-center gap-x-2 mt-1">
+                          <span class="text-xs font-black uppercase tracking-widest text-amber-500">{item.organisasi}</span>
+                          <span class="text-[10px] text-slate-600">•</span>
+                          <span class="text-xs font-medium text-slate-500 uppercase tracking-tight">{item.periode}</span>
+                        </div>
+                        <p class="mt-4 text-sm leading-relaxed text-slate-400 max-w-2xl">{item.deskripsi}</p>
+                        {item.metadata?.kategori && (
+                          <div class="mt-4 flex gap-2">
+                             <span class="rounded-full bg-white/5 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-slate-400 border border-white/5">
+                              {item.metadata.kategori}
+                             </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        data-edit={JSON.stringify(item)}
+                        class="rounded-full h-9 w-9 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        data-delete-exp={item.id}
+                        class="rounded-full h-9 w-9 text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    <!-- Form Section -->
+    <aside class="space-y-6">
+      <Card class="border-white/5 bg-white/[0.02] sticky top-24 shadow-2xl">
+        <CardHeader class="border-b border-white/5">
+          <CardTitle id="formTitle" class="text-sm font-black uppercase tracking-widest text-amber-500">Form Pengalaman</CardTitle>
+          <CardDescription class="text-[11px]">Masukkan detail peran teknis atau riset Anda.</CardDescription>
+        </CardHeader>
+        <CardContent class="pt-6">
+          <form id="formPengalaman" class="space-y-5">
+            <input type="hidden" id="expId" />
+            
+            <div class="grid gap-2">
+              <Label for="peran" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Judul Rekam Jejak</Label>
+              <Input id="peran" name="peran" required placeholder="Fullstack Engineer / Peneliti AI" class="rounded-md border-white/10 bg-white/5 focus:ring-amber-500/50" />
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="organisasi" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Nama Organisasi / Klien</Label>
+              <Input id="organisasi" name="organisasi" required placeholder="PT. Teknologi Maju / Proyek Mandiri" class="rounded-md border-white/10 bg-white/5 focus:ring-amber-500/50" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="grid gap-2">
+                <Label for="periode" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Periode</Label>
+                <Input id="periode" name="periode" required placeholder="2025 - 2026" class="rounded-md border-white/10 bg-white/5 focus:ring-amber-500/50" />
+              </div>
+              <div class="grid gap-2">
+                <Label for="urutan" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Prioritas</Label>
+                <Input id="urutan" name="urutan" type="number" defaultValue="0" class="rounded-md border-white/10 bg-white/5 focus:ring-amber-500/50" />
+              </div>
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="kategori" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Kategori</Label>
+              <Input id="kategori" name="kategori" placeholder="Pekerjaan / Riset / Open Source" class="rounded-md border-white/10 bg-white/5 focus:ring-amber-500/50" />
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="deskripsi" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Rincian Teknis</Label>
+              <Textarea id="deskripsi" name="deskripsi" required rows={5} placeholder="Jelaskan peran, stack yang digunakan, dan hasil yang dicapai..." class="rounded-md border-white/10 bg-white/5 focus:ring-amber-500/50 min-h-[120px]" />
+            </div>
+
+            <div class="pt-4 space-y-3">
+              <Button type="submit" id="btnSubmit" class="w-full rounded-full bg-amber-500 font-black uppercase tracking-widest text-slate-950 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:bg-amber-400">
+                Simpan Pengalaman
+              </Button>
+              <Button type="button" id="btnReset" variant="outline" class="w-full rounded-full border-white/10 bg-white/5 font-bold hover:bg-white/10">
+                Reset Form
+              </Button>
+            </div>
+            
+            <p id="formMessage" class="hidden p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest"></p>
+          </form>
+        </CardContent>
+      </Card>
+    </aside>
+  </div>
+
+  <script>
+    const form = document.getElementById("formPengalaman") as HTMLFormElement;
+    const expId = document.getElementById("expId") as HTMLInputElement;
+    const formTitle = document.getElementById("formTitle");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const formMessage = document.getElementById("formMessage");
+
+    const ids = ["peran", "organisasi", "periode", "kategori", "urutan", "deskripsi"] as const;
+    const fields = ids.reduce((acc, id) => {
+      acc[id] = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement;
+      return acc;
+    }, {} as any);
+
+    function showMessage(text: string, isError = false) {
+      if (!formMessage) return;
+      formMessage.textContent = text;
+      formMessage.className = `p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest ${isError ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`;
+      formMessage.classList.remove('hidden');
+      setTimeout(() => formMessage.classList.add('hidden'), 3000);
+    }
+
+    document.querySelectorAll("[data-edit]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const item = JSON.parse(button.getAttribute("data-edit") || "{}");
+        expId.value = item.id || "";
+        fields.peran.value = item.peran || "";
+        fields.organisasi.value = item.organisasi || "";
+        fields.periode.value = item.periode || "";
+        fields.kategori.value = item.metadata?.kategori || "";
+        fields.urutan.value = String(item.urutan || 0);
+        fields.deskripsi.value = item.deskripsi || "";
+        
+        if (formTitle) formTitle.textContent = "Edit Pengalaman";
+        if (btnSubmit) btnSubmit.textContent = "Perbarui Entri";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    document.getElementById("btnReset")?.addEventListener("click", () => {
+      form.reset();
+      expId.value = "";
+      if (formTitle) formTitle.textContent = "Form Pengalaman";
+      if (btnSubmit) btnSubmit.textContent = "Simpan Pengalaman";
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const id = expId.value;
+      const payload = {
+        peran: fields.peran.value,
+        organisasi: fields.organisasi.value,
+        periode: fields.periode.value,
+        deskripsi: fields.deskripsi.value,
+        urutan: Number(fields.urutan.value || 0),
+        metadata: { kategori: fields.kategori.value },
+      };
+
+      try {
+        if (btnSubmit) btnSubmit.setAttribute('disabled', 'true');
+        const res = await fetch(id ? `/api/admin/pengalaman/${id}` : "/api/admin/pengalaman", {
+          method: id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          showMessage("Pengalaman IT berhasil disinkronkan.");
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          throw new Error("Gagal menyimpan data.");
+        }
+      } catch (err) {
+        showMessage(err instanceof Error ? err.message : "Kesalahan jaringan.", true);
+      } finally {
+        if (btnSubmit) btnSubmit.removeAttribute('disabled');
+      }
+    });
+
+    document.querySelectorAll("[data-delete-exp]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.getAttribute("data-delete-exp");
+        if (!id || !confirm("Hapus rekam jejak ini secara permanen?")) return;
+        
+        try {
+          const res = await fetch(`/api/admin/pengalaman/${id}`, { method: "DELETE" });
+          if (res.ok) window.location.reload();
+          else alert("Gagal menghapus data.");
+        } catch (err) {
+          alert("Terjadi kesalahan jaringan.");
+        }
+      });
+    });
+  </script>
+</LayoutAdmin>
+

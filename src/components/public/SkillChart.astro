@@ -1,0 +1,71 @@
+---
+import type { Keahlian } from '@/lib/content';
+import SkillStatsCard from './SkillStatsCard.astro';
+import SkillBarsCard from './SkillBarsCard.astro';
+import SkillCategoryCarousel from './SkillCategoryCarousel.astro';
+
+interface Props {
+  skills: Keahlian[];
+}
+
+const { skills = [] } = Astro.props;
+
+const topSkill = skills.length > 0 ? skills.reduce((a, b) => a.persentase > b.persentase ? a : b) : null;
+const avgPercent = skills.length > 0 ? Math.round(skills.reduce((s, k) => s + k.persentase, 0) / skills.length) : 0;
+const categories = [...new Set(skills.map(s => s.kategori || 'Umum'))];
+---
+
+<section id="statistik-keahlian" class="relative py-32 px-8 sm:px-12 lg:px-20 overflow-hidden font-['Outfit']">
+  <div class="absolute right-[-5%] top-[20%] h-[600px] w-[600px] bg-violet-500/8 blur-[160px] pointer-events-none"></div>
+  <div class="absolute left-[-10%] bottom-[10%] h-[400px] w-[400px] bg-cyan-500/5 blur-[120px] pointer-events-none"></div>
+
+  <div class="mx-auto max-w-7xl relative z-10">
+    <div class="mb-16 text-center lg:text-left">
+      <h2 class="text-[10px] font-black uppercase tracking-[0.6em] text-violet-400">Skill Proficiency</h2>
+      <h3 class="mt-4 text-4xl font-black text-white sm:text-6xl tracking-tight leading-tight">Peta <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">Keahlian.</span></h3>
+      <p class="mt-6 text-lg text-slate-400 max-w-2xl">Visualisasi tingkat penguasaan teknologi dan alat yang saya gunakan dalam rekayasa perangkat lunak.</p>
+    </div>
+
+    {skills.length === 0 ? (
+      <div class="skill-card rounded-md border border-white/[0.06] bg-white/[0.02] p-16 text-center backdrop-blur-sm">
+        <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-violet-500/20 bg-violet-500/5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-violet-400"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+        </div>
+        <h4 class="text-xl font-bold text-white/60 mb-2">Chart Belum Tersedia</h4>
+        <p class="text-sm text-slate-500">Tambahkan keahlian melalui panel admin untuk menampilkan visualisasi skill chart.</p>
+      </div>
+    ) : (
+      <div class="flex flex-col gap-4">
+        <div class="grid gap-4 lg:grid-cols-3 relative">
+          <SkillStatsCard skills={skills} avgPercent={avgPercent} categories={categories} topSkill={topSkill} />
+          <div class="flex flex-col gap-4 lg:col-span-2 h-full">
+            <SkillBarsCard skills={skills} />
+          </div>
+        </div>
+        <SkillCategoryCarousel skills={skills} categories={categories} />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  :global(.skill-card) { position: relative; }
+  :global(.skill-card::before) {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, transparent 50%, rgba(34, 211, 238, 0.05) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; opacity: 0; transition: opacity 0.7s;
+  }
+  :global(.skill-card:hover::before) { opacity: 1; }
+  :global(.radial-ring) { stroke-dashoffset: 314.16; transition: stroke-dashoffset 2s cubic-bezier(0.22, 1, 0.36, 1); }
+  :global(.radial-ring.animate) { stroke-dashoffset: var(--target-offset) !important; }
+  :global(.hide-scrollbar::-webkit-scrollbar) { display: none; }
+  :global(.hide-scrollbar) { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<script>
+  import { initSkillAnimations } from "@/lib/public/skill-animations";
+  initSkillAnimations();
+  document.addEventListener('astro:page-load', initSkillAnimations);
+</script>

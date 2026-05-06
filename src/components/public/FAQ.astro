@@ -1,0 +1,47 @@
+---
+const faqs = [
+  {
+    q: "Bagaimana Anda menjamin performa proyek?",
+    a: "Saya memanfaatkan Edge Computing (Cloudflare Workers) dan strategi caching tingkat lanjut untuk menjamin waktu respons di bawah 100ms secara global."
+  },
+  {
+    q: "Apa stack pengembangan yang biasa Anda gunakan?",
+    a: "Stack inti saya meliputi Astro, TypeScript, Tailwind CSS, dan Cloudflare D1/R2. Saya juga ahli dalam integrasi AI melalui Groq/OpenAI."
+  },
+  {
+    q: "Apakah Anda menawarkan dukungan pasca-peluncuran?",
+    a: "Ya, saya menyediakan paket pemantauan dan pemeliharaan komprehensif untuk memastikan aplikasi Anda tetap aman dan terbarui."
+  },
+  {
+    q: "Bisakah Anda menangani migrasi sistem yang kompleks?",
+    a: "Tentu saja. Saya memiliki pengalaman memfaktorkan ulang monolit lama menjadi microservices dengan arsitektur yang bersih dan modern."
+  }
+];
+---
+
+<section id="faq" class="py-32 px-8 sm:px-12 lg:px-20 relative overflow-hidden">
+  <div class="mx-auto max-w-4xl">
+    <div class="text-center mb-20">
+      <h2 class="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-500">Pertanyaan Umum</h2>
+      <h3 class="mt-4 text-4xl font-black text-white sm:text-6xl tracking-tight">Jawaban untuk <span class="text-cyan-400">pertanyaan Anda</span></h3>
+    </div>
+
+    <div class="space-y-6">
+      {faqs.map((faq, idx) => (
+        <details class="group rounded-md border border-white/5 bg-[#080808]/80 p-8 backdrop-blur-sm transition-all duration-500 hover:bg-white/[0.03] hover:border-white/10 shadow-2xl">
+          <summary class="flex cursor-pointer items-center justify-between list-none font-bold text-lg text-white group-open:text-cyan-400 transition-colors">
+            {faq.q}
+            <div class="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 transition-transform duration-500 group-open:rotate-180 group-open:bg-cyan-400 group-open:border-cyan-400 group-open:text-black">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </summary>
+          <div class="overflow-hidden">
+            <p class="mt-8 text-base leading-relaxed text-slate-400 max-w-3xl border-l-2 border-cyan-400/30 pl-6">
+              {faq.a}
+            </p>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

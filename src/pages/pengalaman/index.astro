@@ -1,0 +1,80 @@
+---
+import LayoutPublic from '@/layouts/LayoutPublic.astro';
+import Pagination from '@/components/public/Pagination.astro';
+import { getPaginatedPengalamanIT, getSettings } from '@/lib/content';
+
+export const prerender = false;
+
+const db = Astro.locals.runtime.env.DB;
+const page = Math.max(1, Number(Astro.url.searchParams.get('page')) || 1);
+const perPage = 10;
+
+const [settings, { data: pengalaman, totalPages, total }] = await Promise.all([
+  getSettings(db),
+  getPaginatedPengalamanIT(db, page, perPage),
+]);
+
+const showTotal = total > 0;
+const pageTitle = page > 1 ? ` — Halaman ${page}` : '';
+
+function formatIndex(idx: number) {
+  const num = ((page - 1) * perPage) + idx + 1;
+  return num < 10 ? `0${num}` : String(num);
+}
+---
+
+<LayoutPublic 
+  title={`Semua Pengalaman${pageTitle} | ${settings.nama_pemilik}`} 
+  description="Daftar lengkap pengalaman profesional dan jejak karir." 
+  ownerName={settings.nama_pemilik} 
+  email={settings.email_kontak}
+>
+  <section class="relative mx-auto max-w-7xl px-4 pb-32 pt-48 font-['Outfit'] overflow-hidden">
+    <!-- Dynamic Background Ambient -->
+    <div class="absolute left-[10%] top-[10%] h-[500px] w-[500px] bg-cyan-500/10 blur-[140px] pointer-events-none"></div>
+
+    <div class="relative z-10 mb-20 max-w-4xl">
+      <div class="mb-8 inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 backdrop-blur-md">
+          Indeks Karir
+      </div>
+      <h1 class="text-5xl font-black tracking-tight text-white sm:text-7xl leading-[1.1]">Jejak <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">Profesional.</span></h1>
+      <p class="mt-8 text-lg leading-relaxed text-slate-400 max-w-2xl">Catatan lengkap perjalanan karir, peran teknis, dan kontribusi pada berbagai organisasi dan proyek.</p>
+      {showTotal && (
+        <p class="mt-4 text-sm text-slate-600">{total} catatan pengalaman</p>
+      )}
+    </div>
+
+    <div class="relative z-10 grid gap-6">
+      {pengalaman.length === 0 ? (
+        <div class="rounded-md border border-white/5 bg-[#080808] p-12 text-center text-slate-500">
+            Belum ada catatan pengalaman yang tersedia saat ini.
+        </div>
+      ) : pengalaman.map((exp, idx) => (
+        <div class="group relative overflow-hidden rounded-md border border-white/5 bg-[#080808] p-8 md:p-10 transition-all duration-700 hover:border-cyan-500/30 hover:-translate-y-1 shadow-2xl">
+          <!-- Glow Effect -->
+          <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/5 group-hover:to-transparent transition-all duration-700 pointer-events-none"></div>
+          
+          <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div class="flex-1">
+              <h4 class="text-2xl font-black text-white mb-2 group-hover:text-cyan-400 transition-colors duration-500">{exp.peran}</h4>
+              <div class="flex items-center gap-3 text-sm font-semibold text-slate-400 mb-6">
+                <span class="text-white">{exp.organisasi}</span>
+                <span class="h-1 w-1 rounded-full bg-slate-600"></span>
+                <span class="text-cyan-500/80">{exp.periode}</span>
+              </div>
+              <p class="text-base text-slate-500 leading-relaxed whitespace-pre-wrap max-w-3xl">{exp.deskripsi}</p>
+            </div>
+            
+            <div class="hidden md:flex flex-col items-end justify-start opacity-20 group-hover:opacity-100 transition-opacity duration-700">
+              <div class="h-12 w-12 rounded-full border border-cyan-500/20 flex items-center justify-center bg-cyan-500/5">
+                 <span class="text-cyan-400 font-mono text-[10px] font-black">{formatIndex(idx)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <Pagination currentPage={page} totalPages={totalPages} baseUrl="/pengalaman" accentColor="cyan" />
+  </section>
+</LayoutPublic>

@@ -1,0 +1,73 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { AnalyticsService } from "@/core/services/AnalyticsService";
+import StatsGrid from "@/components/admin/StatsGrid.astro";
+import RecentActivity from "@/components/admin/RecentActivity.astro";
+import DashboardSidebar from "@/components/admin/DashboardSidebar.astro";
+
+export const prerender = false;
+
+const db = Astro.locals.runtime.env.DB;
+const analyticsService = new AnalyticsService(db);
+const data = await analyticsService.getDashboardStats();
+
+const { projects, experience, certificates, recentProjects, recommendation } = data;
+
+const stats = [
+  {
+    label: "Total Proyek",
+    value: projects.total,
+    desc: `${projects.published} Live`,
+    icon: "folder",
+    color: "text-cyan-400",
+    bg: "bg-cyan-500/10",
+  },
+  {
+    label: "View Konten",
+    value: projects.views.toLocaleString(),
+    desc: "Total Jangkauan",
+    icon: "eye",
+    color: "text-amber-400",
+    bg: "bg-amber-500/10",
+  },
+  {
+    label: "Sertifikasi",
+    value: certificates.total,
+    desc: "Kredensial Aktif",
+    icon: "award",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+  },
+  {
+    label: "Pengalaman",
+    value: experience.total,
+    desc: "Rekam Jejak",
+    icon: "zap",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
+  },
+];
+---
+
+<LayoutAdmin
+  title="Overview Dashboard"
+  subtitle="Monitor status publikasi, analisis skill, dan aktivitas terbaru di platform Anda."
+  breadcrumbs={[{ label: "Dashboard" }]}
+>
+  <StatsGrid stats={stats} />
+
+  <div class="mt-10 grid gap-8 xl:grid-cols-[2fr_1fr]">
+    <RecentActivity recentProjects={recentProjects} />
+    <DashboardSidebar recommendation={recommendation} />
+  </div>
+
+  <script>
+    import { initDashboardAnimations } from "@/lib/admin/dashboard-animations";
+    
+    // Initialize animations on page load
+    initDashboardAnimations();
+    
+    // Handle Astro view transitions if used
+    document.addEventListener('astro:page-load', initDashboardAnimations);
+  </script>
+</LayoutAdmin>

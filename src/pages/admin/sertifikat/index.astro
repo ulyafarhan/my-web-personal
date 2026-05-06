@@ -1,0 +1,224 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { getSertifikat } from "@/lib/content";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export const prerender = false;
+
+const sertifikat = await getSertifikat(Astro.locals.runtime.env.DB, 100);
+---
+
+<LayoutAdmin
+  title="Repositori Sertifikasi"
+  subtitle="Kelola kredensial, lisensi, dan sertifikat kompetensi teknis yang memperkuat profil profesional Anda."
+  breadcrumbs={[{ label: 'Sertifikat' }]}
+>
+  <div class="grid gap-8 lg:grid-cols-[1fr_380px]">
+    <!-- List Section -->
+    <div class="space-y-6">
+      <Card class="border-white/5 bg-white/[0.01]">
+        <CardHeader class="border-b border-white/5 pb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <CardTitle class="text-xl font-bold text-white">Daftar Sertifikat</CardTitle>
+              <CardDescription>Kredensial yang telah Anda tambahkan ke portofolio.</CardDescription>
+            </div>
+            <span class="rounded-full bg-cyan-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-cyan-400 ring-1 ring-cyan-500/20">
+              {sertifikat.length} Entri
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent class="p-0">
+          <div class="divide-y divide-white/5">
+            {sertifikat.length === 0 ? (
+              <div class="p-12 text-center text-sm text-slate-500 italic">Belum ada sertifikat terdaftar.</div>
+            ) : (
+              sertifikat.map((item) => (
+                <div class="group flex items-center justify-between p-6 hover:bg-white/[0.02] transition-all">
+                  <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-md bg-white/5 text-slate-400 group-hover:bg-cyan-500/10 group-hover:text-cyan-400 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-white group-hover:text-cyan-400 transition-colors">{item.nama}</h3>
+                      <p class="text-xs font-medium text-slate-500 mt-1 uppercase tracking-widest">{item.penerbit} • {item.tahun}</p>
+                      {item.url_kredensial && (
+                        <a href={item.url_kredensial} target="_blank" class="mt-2 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-300 transition-colors">
+                          Verifikasi Kredensial
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      data-edit={JSON.stringify(item)}
+                      class="rounded-full h-8 w-8 text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      data-delete-cert={item.id}
+                      class="rounded-full h-8 w-8 text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    <!-- Form Section -->
+    <aside class="space-y-6">
+      <Card class="border-white/5 bg-white/[0.02] sticky top-24">
+        <CardHeader class="border-b border-white/5">
+          <CardTitle id="formTitle" class="text-sm font-bold uppercase tracking-widest">Input Sertifikasi</CardTitle>
+        </CardHeader>
+        <CardContent class="pt-6">
+          <form id="formSertifikat" class="space-y-5">
+            <input type="hidden" id="certId" />
+            
+            <div class="grid gap-2">
+              <Label for="nama" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Judul Sertifikasi</Label>
+              <Input id="nama" name="nama" required placeholder="Misal: AWS Certified Developer" class="rounded-md border-white/10 bg-white/5 focus:ring-cyan-500/50" />
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="penerbit" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Institusi Penerbit</Label>
+              <Input id="penerbit" name="penerbit" required placeholder="Amazon Web Services" class="rounded-md border-white/10 bg-white/5 focus:ring-cyan-500/50" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="grid gap-2">
+                <Label for="tahun" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Tahun</Label>
+                <Input id="tahun" name="tahun" required placeholder="2026" class="rounded-md border-white/10 bg-white/5 focus:ring-cyan-500/50" />
+              </div>
+              <div class="grid gap-2">
+                <Label for="urutanCert" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Prioritas</Label>
+                <Input id="urutanCert" name="urutan" type="number" defaultValue="0" class="rounded-md border-white/10 bg-white/5 focus:ring-cyan-500/50" />
+              </div>
+            </div>
+
+            <div class="grid gap-2">
+              <Label for="url_kredensial" class="text-[10px] font-black uppercase tracking-widest text-slate-500">URL Verifikasi</Label>
+              <Input id="url_kredensial" name="url_kredensial" type="url" placeholder="https://..." class="rounded-md border-white/10 bg-white/5 focus:ring-cyan-500/50" />
+            </div>
+
+            <div class="pt-4 space-y-3">
+              <Button type="submit" id="btnSubmit" class="w-full rounded-full bg-cyan-500 font-black uppercase tracking-widest text-slate-950 shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:bg-cyan-400">
+                Simpan Entri
+              </Button>
+              <Button type="button" id="btnReset" variant="outline" class="w-full rounded-full border-white/10 bg-white/5 font-bold hover:bg-white/10">
+                Reset Form
+              </Button>
+            </div>
+            
+            <p id="formMessage" class="hidden p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest"></p>
+          </form>
+        </CardContent>
+      </Card>
+    </aside>
+  </div>
+
+  <script>
+    const form = document.getElementById("formSertifikat") as HTMLFormElement;
+    const certId = document.getElementById("certId") as HTMLInputElement;
+    const formTitle = document.getElementById("formTitle");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const formMessage = document.getElementById("formMessage");
+
+    const ids = ["nama", "penerbit", "tahun", "url_kredensial", "urutanCert"] as const;
+    const fields = ids.reduce((acc, id) => {
+      acc[id] = document.getElementById(id) as HTMLInputElement;
+      return acc;
+    }, {} as any);
+
+    function showMessage(text: string, isError = false) {
+      if (!formMessage) return;
+      formMessage.textContent = text;
+      formMessage.className = `p-3 rounded-md text-[10px] font-bold text-center uppercase tracking-widest ${isError ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`;
+      formMessage.classList.remove('hidden');
+      setTimeout(() => formMessage.classList.add('hidden'), 3000);
+    }
+
+    document.querySelectorAll("[data-edit]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const item = JSON.parse(button.getAttribute("data-edit") || "{}");
+        certId.value = item.id || "";
+        fields.nama.value = item.nama || "";
+        fields.penerbit.value = item.penerbit || "";
+        fields.tahun.value = item.tahun || "";
+        fields.url_kredensial.value = item.url_kredensial || "";
+        fields.urutanCert.value = String(item.urutan || 0);
+        
+        if (formTitle) formTitle.textContent = "Edit Sertifikasi";
+        if (btnSubmit) btnSubmit.textContent = "Perbarui Entri";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    document.getElementById("btnReset")?.addEventListener("click", () => {
+      form.reset();
+      certId.value = "";
+      if (formTitle) formTitle.textContent = "Input Sertifikasi";
+      if (btnSubmit) btnSubmit.textContent = "Simpan Entri";
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const id = certId.value;
+      const payload = {
+        nama: fields.nama.value,
+        penerbit: fields.penerbit.value,
+        tahun: fields.tahun.value,
+        url_kredensial: fields.url_kredensial.value,
+        urutan: Number(fields.urutanCert.value || 0),
+      };
+
+      try {
+        if (btnSubmit) btnSubmit.setAttribute('disabled', 'true');
+        const res = await fetch(id ? `/api/admin/sertifikat/${id}` : "/api/admin/sertifikat", {
+          method: id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          showMessage("Data berhasil disinkronkan.");
+          setTimeout(() => window.location.reload(), 1000);
+        } else {
+          throw new Error("Gagal menyimpan data.");
+        }
+      } catch (err) {
+        showMessage(err instanceof Error ? err.message : "Kesalahan jaringan.", true);
+      } finally {
+        if (btnSubmit) btnSubmit.removeAttribute('disabled');
+      }
+    });
+
+    document.querySelectorAll("[data-delete-cert]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.getAttribute("data-delete-cert");
+        if (!id || !confirm("Hapus sertifikat ini secara permanen?")) return;
+        
+        try {
+          const res = await fetch(`/api/admin/sertifikat/${id}`, { method: "DELETE" });
+          if (res.ok) window.location.reload();
+          else alert("Gagal menghapus data.");
+        } catch (err) {
+          alert("Terjadi kesalahan jaringan.");
+        }
+      });
+    });
+  </script>
+</LayoutAdmin>

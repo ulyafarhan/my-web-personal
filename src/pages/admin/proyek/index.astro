@@ -1,0 +1,82 @@
+---
+import LayoutAdmin from "@/layouts/LayoutAdmin.astro";
+import { D1ProyekRepository } from "@/core/repositories/D1ProyekRepository";
+import { ProyekService } from "@/core/services/ProyekService";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import ProjectListTable from "@/components/admin/proyek/ProjectListTable.astro";
+
+export const prerender = false;
+
+const db = Astro.locals.runtime.env.DB;
+const repo = new D1ProyekRepository(db);
+const service = new ProyekService(repo);
+const { data: proyek, meta } = await service.ambilSemua(1, 100);
+---
+
+<LayoutAdmin
+  title="Repositori Proyek"
+  subtitle="Kelola seluruh dokumentasi karya, riset, dan eksperimen teknis Anda di sini."
+  breadcrumbs={[{ label: "Proyek" }]}
+>
+  <Card class="border-white/5 bg-white/[0.01]">
+    <CardHeader
+      class="flex flex-row items-center justify-between gap-4 border-b border-white/5 pb-6"
+    >
+      <div>
+        <CardTitle class="text-xl font-bold text-white">Daftar Proyek</CardTitle>
+        <p
+          class="mt-1 text-xs font-medium text-slate-500 uppercase tracking-widest"
+        >
+          {meta.total} Proyek Terdeteksi
+        </p>
+      </div>
+      <Button
+        as="a"
+        href="/admin/proyek/tambah"
+        class="rounded-full bg-cyan-500 font-black uppercase tracking-widest text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:bg-cyan-400"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="mr-2"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg
+        >
+        Baru
+      </Button>
+    </Header>
+
+    <CardContent class="p-0">
+      <ProjectListTable proyek={proyek} />
+    </CardContent>
+  </Card>
+
+  <script>
+    document.querySelectorAll("[data-delete-project]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.getAttribute("data-delete-project");
+        if (
+          !id ||
+          !confirm("Hapus proyek ini secara permanen dari basis data?")
+        )
+          return;
+
+        try {
+          const res = await fetch(`/api/admin/proyek/${id}`, {
+            method: "DELETE",
+          });
+          if (res.ok) window.location.reload();
+          else alert("Gagal menghapus proyek. Pastikan Anda memiliki akses.");
+        } catch (err) {
+          alert("Terjadi kesalahan jaringan.");
+        }
+      });
+    });
+  </script>
+</LayoutAdmin>

@@ -1,0 +1,216 @@
+---
+/**
+ * SplashCursor.astro
+ * Fluid Simulation Cursor Effect
+ */
+interface Props {
+  SIM_RESOLUTION?: number;
+  DYE_RESOLUTION?: number;
+  CAPTURE_RESOLUTION?: number;
+  DENSITY_DISSIPATION?: number;
+  VELOCITY_DISSIPATION?: number;
+  PRESSURE?: number;
+  PRESSURE_ITERATIONS?: number;
+  CURL?: number;
+  SPLAT_RADIUS?: number;
+  SPLAT_FORCE?: number;
+  SHADING?: boolean;
+  COLOR_UPDATE_SPEED?: number;
+  BACK_COLOR?: { r: number; g: number; b: number };
+  TRANSPARENT?: boolean;
+}
+
+const {
+  SIM_RESOLUTION = 64, // Lowered from 128
+  DYE_RESOLUTION = 512, // Lowered from 1440
+  CAPTURE_RESOLUTION = 256, // Lowered from 512
+  DENSITY_DISSIPATION = 4.0,
+  VELOCITY_DISSIPATION = 3.0,
+  PRESSURE = 0.1,
+  PRESSURE_ITERATIONS = 12, // Lowered from 20
+  CURL = 0.3,
+  SPLAT_RADIUS = 0.05,
+  SPLAT_FORCE = 2000,
+  SHADING = true,
+  COLOR_UPDATE_SPEED = 3,
+  BACK_COLOR = { r: 0, g: 0, b: 0 },
+  TRANSPARENT = true
+} = Astro.props;
+---
+
+<div class="fixed top-0 left-0 z-0 pointer-events-none w-full h-full opacity-70">
+  <canvas 
+    id="fluidCanvas" 
+    class="w-screen h-screen block"
+    data-sim={SIM_RESOLUTION}
+    data-dye={DYE_RESOLUTION}
+    data-capture={CAPTURE_RESOLUTION}
+    data-density={DENSITY_DISSIPATION}
+    data-velocity={VELOCITY_DISSIPATION}
+    data-pressure={PRESSURE}
+    data-p-iterations={PRESSURE_ITERATIONS}
+    data-curl={CURL}
+    data-radius={SPLAT_RADIUS}
+    data-force={SPLAT_FORCE}
+    data-shading={SHADING}
+    data-color-speed={COLOR_UPDATE_SPEED}
+    data-back-r={BACK_COLOR.r}
+    data-back-g={BACK_COLOR.g}
+    data-back-b={BACK_COLOR.b}
+    data-transparent={TRANSPARENT}
+  ></canvas>
+</div>
+
+<script>
+  import { getWebGLContext } from "@/lib/public/fluid/webgl-utils";
+  import { Simulation } from "@/lib/public/fluid/simulation";
+  import { createPointer, updatePointerDownData, updatePointerMoveData, scaleByPixelRatio, generateColor } from "@/lib/public/fluid/input";
+
+  function initFluid() {
+    const canvas = document.getElementById('fluidCanvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const config = {
+      SIM_RESOLUTION: parseInt(canvas.dataset.sim || '128'),
+      DYE_RESOLUTION: parseInt(canvas.dataset.dye || '1440'),
+      DENSITY_DISSIPATION: parseFloat(canvas.dataset.density || '6.0'),
+      VELOCITY_DISSIPATION: parseFloat(canvas.dataset.velocity || '5.0'),
+      PRESSURE: parseFloat(canvas.dataset.pressure || '0.1'),
+      PRESSURE_ITERATIONS: parseInt(canvas.dataset.pIterations || '20'),
+      CURL: parseFloat(canvas.dataset.curl || '0.5'),
+      SPLAT_RADIUS: parseFloat(canvas.dataset.radius || '0.08'),
+      SPLAT_FORCE: parseFloat(canvas.dataset.force || '2500'),
+      SHADING: canvas.dataset.shading === 'true',
+      COLOR_UPDATE_SPEED: parseFloat(canvas.dataset.colorSpeed || '5'),
+    };
+
+    const { gl, ext } = getWebGLContext(canvas);
+    if (!gl || !ext) return;
+
+    const sim = new Simulation(gl, ext, config, canvas);
+    sim.programs.display.setKeywords(config.SHADING ? ['SHADING'] : []);
+    sim.initFramebuffers();
+
+    const pointers = [createPointer()];
+    let lastUpdateTime = Date.now();
+    let colorUpdateTimer = 0.0;
+    let active = false;
+    let running = false;
+    let idleTicks = 0;
+    let frameId: number;
+    let isTabVisible = true;
+
+    document.addEventListener('visibilitychange', () => {
+      isTabVisible = document.visibilityState === 'visible';
+      if (isTabVisible && active) startRunning();
+    });
+
+    function update() {
+      if (!isTabVisible) {
+        running = false;
+        return;
+      }
+
+      const now = Date.now();
+      let dt = Math.min((now - lastUpdateTime) / 1000, 0.016666);
+      lastUpdateTime = now;
+
+      const w = scaleByPixelRatio(canvas.clientWidth), h = scaleByPixelRatio(canvas.clientHeight);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w; canvas.height = h;
+        sim.initFramebuffers();
+      }
+
+      colorUpdateTimer += dt * config.COLOR_UPDATE_SPEED;
+      if (colorUpdateTimer >= 1) {
+        colorUpdateTimer %= 1;
+        pointers.forEach(p => p.color = generateColor());
+      }
+
+      let moving = false;
+      pointers.forEach(p => {
+        if (p.moved) {
+          p.moved = false;
+          moving = true;
+          sim.splat(p.texcoordX, p.texcoordY, p.deltaX * config.SPLAT_FORCE, p.deltaY * config.SPLAT_FORCE, p.color);
+        }
+      });
+
+      if (moving) idleTicks = 0; else idleTicks++;
+
+      // Auto-pause if idle for 2 seconds (approx 120 frames)
+      if (idleTicks > 120 && !pointers[0].down) {
+        running = false;
+        active = false;
+        if (frameId) cancelAnimationFrame(frameId);
+        return;
+      }
+
+      sim.step(dt);
+      sim.render(null);
+      frameId = requestAnimationFrame(update);
+    }
+
+    const startRunning = () => {
+      active = true;
+      if (running || !isTabVisible) return;
+      running = true;
+      idleTicks = 0;
+      lastUpdateTime = Date.now();
+      update();
+    };
+
+    // Use passive listeners for touch events
+    window.addEventListener('mousedown', e => {
+      startRunning();
+      updatePointerDownData(pointers[0], -1, scaleByPixelRatio(e.clientX), scaleByPixelRatio(e.clientY), canvas);
+    });
+
+    const handleMove = (e: any) => {
+      startRunning();
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const y = e.clientY || (e.touches && e.touches[0].clientY);
+      updatePointerMoveData(pointers[0], scaleByPixelRatio(x), scaleByPixelRatio(y), canvas);
+    };
+
+    window.addEventListener('mousemove', handleMove, { passive: true });
+
+    window.addEventListener('touchstart', e => {
+      startRunning();
+      const t = e.targetTouches[0];
+      updatePointerDownData(pointers[0], t.identifier, scaleByPixelRatio(t.clientX), scaleByPixelRatio(t.clientY), canvas);
+    }, { passive: true });
+
+    window.addEventListener('touchmove', handleMove, { passive: true });
+
+    window.addEventListener('touchend', () => pointers[0].down = false);
+  }
+
+  function init() {
+    // Detect mobile/low-end devices
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      console.log('SplashCursor disabled for mobile performance');
+      return;
+    }
+
+    const run = () => {
+      setTimeout(() => {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(() => initFluid());
+        } else {
+          initFluid();
+        }
+      }, 3000); 
+    };
+
+    if (document.readyState === 'complete') run();
+    else window.addEventListener('load', run);
+  }
+
+
+
+  // Init on load
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

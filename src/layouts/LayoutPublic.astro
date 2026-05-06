@@ -1,0 +1,102 @@
+---
+import '@/styles/app.css';
+import Navbar from '@/components/public/Navbar.astro';
+import Footer from '@/components/public/Footer.astro';
+import SplashCursor from '@/components/public/SplashCursor.astro';
+import ChatbotButton from '@/components/public/ChatbotButton.astro';
+
+// Import font files directly for preloading (Native Solution)
+import outfitLatin400 from '@fontsource/outfit/files/outfit-latin-400-normal.woff2?url';
+import outfitLatin700 from '@fontsource/outfit/files/outfit-latin-700-normal.woff2?url';
+
+
+interface Props {
+  title: string;
+  description?: string;
+  ownerName?: string;
+  email?: string;
+  socials?: {
+    github?: string;
+    instagram?: string;
+    linkedin?: string;
+    whatsapp?: string;
+    tiktok?: string;
+  };
+}
+
+const {
+  title,
+  description = 'Portofolio personal pengembang web dan backend.',
+  ownerName = 'Farhan',
+  email = 'hello@example.com',
+  socials = {},
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <!-- Native Font Preloading -->
+    <link rel="preload" href={outfitLatin400} as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href={outfitLatin700} as="font" type="font/woff2" crossorigin="anonymous" />
+    
+    <script is:inline>
+      // Force Dark Mode Early
+      if (typeof localStorage !== 'undefined') {
+        const theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.classList.add(theme + '-theme');
+      } else {
+        document.documentElement.classList.add('dark-theme');
+      }
+    </script>
+
+  </head>
+  <body class="bg-black text-white antialiased selection:bg-cyan-500/30">
+    <SplashCursor />
+
+    <!-- Professional Large Diagonal Grid (Subtle Pattern) -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-black">
+      <div 
+        class="absolute inset-0 opacity-[0.12]"
+        style="
+          background-image: 
+            linear-gradient(45deg, transparent 49.5%, rgba(255,255,255,0.2) 49.5%, rgba(255,255,255,0.2) 50.5%, transparent 50.5%),
+            linear-gradient(-45deg, transparent 49.5%, rgba(255,255,255,0.2) 49.5%, rgba(255,255,255,0.2) 50.5%, transparent 50.5%);
+          background-size: 200px 200px;
+          -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, #000 10%, transparent 90%);
+          mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, #000 10%, transparent 90%);
+        "
+      ></div>
+    </div>
+
+
+
+
+    
+    <div class="relative z-10">
+
+      <Navbar ownerName={ownerName} email={email} />
+      
+      <main class="min-h-screen">
+        <slot />
+      </main>
+
+      <Footer ownerName={ownerName} email={email} socials={socials} />
+    </div>
+
+    <ChatbotButton />
+
+    <!-- Performance Critical Scripts (Deferred) -->
+
+
+
+
+
+  </body>
+</html>

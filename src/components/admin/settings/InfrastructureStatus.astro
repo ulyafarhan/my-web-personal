@@ -1,0 +1,31 @@
+---
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+const infraItems = [
+  { label: "Database Core", value: "D1 Connected", status: "ok" },
+  { label: "Object Storage", value: "R2 Bound", status: "ok" },
+  { label: "Security layer", value: "Better Auth", status: "ok" },
+];
+---
+
+<Card class="border-white/5 bg-white/[0.01]">
+  <CardHeader>
+    <CardTitle class="text-sm font-bold text-white"
+      >Status Infrastruktur</CardTitle
+    >
+  </CardHeader>
+  <CardContent class="space-y-4">
+    {
+      infraItems.map((item) => (
+        <div class="flex items-center justify-between rounded-l bg-white/[0.03] p-3 ring-1 ring-white/5">
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            {item.label}
+          </span>
+          <span class="text-[10px] font-black text-cyan-400 uppercase tracking-tighter">
+            {item.value}
+          </span>
+        </div>
+      ))
+    }
+  </CardContent>
+</Card>
