@@ -4,22 +4,22 @@ compatibility_date = "2024-09-23"
 [[d1_databases]]
 binding = "DB"
 database_name = "portofolio-db"
-database_id = "405fd146-0643-415e-8cb6-65290480e262"
+database_id = "6ed1d446-8ff0-4ca5-b24e-8eb14aa254bc"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "local-kv"
+id = "40249f5514ff4423b980743c73adc903"
 
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "portofolio-assets"
 
 [vars]
-ENVIRONMENT = "development"
-GROQ_API_KEY = "ganti_dengan_api_key_groq_anda"
+ENVIRONMENT = "production"
+GROQ_API_KEY = "PASTE_YOUR_GROQ_API_KEY_IN_DASHBOARD"
 SITE_URL = "http://localhost:4321"
-BETTER_AUTH_SECRET = "ganti_dengan_secret_32_karakter_di_dashboard_cloudflare"
-ADMIN_EMAILS = "admin@admin.com"
+BETTER_AUTH_SECRET = "PASTE_YOUR_AUTH_SECRET_IN_DASHBOARD"
+ADMIN_EMAILS = "muhammadulyafarhan@gmail.com"
 PUBLIC_R2_URL = "http://localhost:4321/uploads"
 
 [ai]

@@ -4,87 +4,118 @@ import LayoutAuth from '@/layouts/LayoutAuth.astro';
 export const prerender = false;
 ---
 
-<LayoutAuth title="Masuk Admin">
-  <form id="formLogin" class="space-y-5">
-    <div id="errorMsg" class="hidden rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-100"></div>
-
-    <div>
-      <label for="username" class="mb-2 block text-sm font-semibold text-slate-200">Username</label>
-      <input
-        type="text"
-        id="username"
-        autocomplete="username"
-        required
-        class="w-full rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300 focus:ring-4 focus:ring-cyan-300/10"
-        placeholder="admin"
-      />
+<LayoutAuth title="Secure Entry | Admin Panel">
+  <div class="relative z-10 w-full max-w-md">
+    <!-- Header Page -->
+    <div class="mb-10 text-center">
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white shadow-2xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <h1 class="text-3xl font-black tracking-tight text-white">Restricted Area</h1>
+      <p class="mt-2 text-sm text-slate-400">Silakan masuk untuk mengelola portofolio Anda.</p>
     </div>
 
-    <div>
-      <label for="password" class="mb-2 block text-sm font-semibold text-slate-200">Password</label>
-      <input
-        type="password"
-        id="password"
-        autocomplete="current-password"
-        required
-        class="w-full rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300 focus:ring-4 focus:ring-cyan-300/10"
-        placeholder="Minimal 8 karakter"
-      />
-    </div>
+    <form id="formLogin" class="space-y-6">
+      <div id="errorMsg" class="hidden rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200 animate-in fade-in slide-in-from-top-2 duration-300"></div>
 
-    <button
-      type="submit"
-      id="btnSubmit"
-      class="w-full rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      Masuk ke Panel
-    </button>
+      <div class="space-y-2">
+        <label for="email" class="text-xs font-bold uppercase tracking-widest text-slate-500">Authorized Email</label>
+        <div class="relative group">
+          <input
+            type="email"
+            id="email"
+            autocomplete="email"
+            required
+            class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none transition duration-300 placeholder:text-slate-700 focus:border-white/30 focus:bg-white/10"
+            placeholder="muhammadulyafarhan@gmail.com"
+          />
+        </div>
+      </div>
 
-    <div class="text-center">
-      <a href="/" class="text-sm font-medium text-slate-400 transition hover:text-white">Kembali ke beranda</a>
-    </div>
-  </form>
+      <div class="space-y-2">
+        <label for="password" class="text-xs font-bold uppercase tracking-widest text-slate-500">Security Key</label>
+        <div class="relative group">
+          <input
+            type="password"
+            id="password"
+            autocomplete="current-password"
+            required
+            class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none transition duration-300 placeholder:text-slate-700 focus:border-white/30 focus:bg-white/10"
+            placeholder="••••••••••••"
+          />
+        </div>
+      </div>
 
-  <script>
-    const form = document.getElementById('formLogin');
-    const errorMsg = document.getElementById('errorMsg');
-    const btn = document.getElementById('btnSubmit');
+      <button
+        type="submit"
+        id="btnSubmit"
+        class="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-white px-6 py-4 text-sm font-black text-black transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+      >
+        <span class="relative z-10">AKSES DASHBOARD</span>
+        <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-black/5 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></div>
+      </button>
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('error') === 'akses-admin' && errorMsg) {
-      errorMsg.textContent = 'Akun berhasil masuk, tetapi tidak terdaftar sebagai admin.';
-      errorMsg.classList.remove('hidden');
-    }
-
-    form?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!btn || !errorMsg) return;
-
-      const username = (document.getElementById('username') as HTMLInputElement)?.value;
-      const password = (document.getElementById('password') as HTMLInputElement)?.value;
-
-      btn.setAttribute('disabled', 'true');
-      btn.textContent = 'Memeriksa sesi...';
-      errorMsg.classList.add('hidden');
-
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
-        const data = await res.json() as any;
-        if (!res.ok) {
-          throw new Error(data.message || 'Username atau password belum sesuai.');
-        }
-
-        window.location.href = '/admin';
-      } catch (err) {
-        errorMsg.textContent = err instanceof Error ? err.message : 'Gagal masuk ke panel admin.';
-        errorMsg.classList.remove('hidden');
-        btn.removeAttribute('disabled');
-        btn.textContent = 'Masuk ke Panel';
-      }
-    });
-  </script>
+      <div class="flex items-center justify-center pt-4">
+        <a href="/" class="group flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:-translate-x-1"><path d="m15 18-6-6 6-6"/></svg>
+          Kembali ke Beranda
+        </a>
+      </div>
+    </form>
+  </div>
 </LayoutAuth>
+
+<script>
+  const form = document.getElementById('formLogin') as HTMLFormElement;
+  const errorMsg = document.getElementById('errorMsg');
+  const btn = document.getElementById('btnSubmit');
+
+  // Handle Redirect Errors
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('error') === 'akses-admin' && errorMsg) {
+    errorMsg.textContent = 'Sesi Anda valid, namun email ini tidak terdaftar sebagai administrator.';
+    errorMsg.classList.remove('hidden');
+  }
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!btn || !errorMsg) return;
+
+    const email = (document.getElementById('email') as HTMLInputElement)?.value;
+    const password = (document.getElementById('password') as HTMLInputElement)?.value;
+
+    btn.setAttribute('disabled', 'true');
+    btn.innerHTML = '<span class="animate-pulse">MEMVERIFIKASI...</span>';
+    errorMsg.classList.add('hidden');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      // Safely check if response is JSON
+      const contentType = res.headers.get("content-type");
+      let data: any;
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        // Handle unexpected non-JSON response (e.g. redirect or 500)
+        throw new Error('Terjadi kesalahan otentikasi. Pastikan koneksi stabil.');
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.message || 'Kredensial yang Anda masukkan salah.');
+      }
+
+      // Success
+      window.location.href = '/admin';
+    } catch (err) {
+      errorMsg.textContent = err instanceof Error ? err.message : 'Gagal mengakses area admin.';
+      errorMsg.classList.remove('hidden');
+      btn.removeAttribute('disabled');
+      btn.innerHTML = '<span class="relative z-10">AKSES DASHBOARD</span>';
+    }
+  });
+</script>
